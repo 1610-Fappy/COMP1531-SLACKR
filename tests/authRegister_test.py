@@ -56,20 +56,27 @@ def test_registerValidEmail():
 
     #Testing for valid domain
     with pytest.raises(InputError) as e:
-        auth_register('poopmaster@cooldomn123.com',)
+        auth_register('poopmaster@cooldomn123.com', 'P@ssword', 'Adolf', 'Ziggler')
 
 
 #Testing that Error raised when email already in use
 def test_registerEmailUsed():
 
-    with pytest.raises(InputError) as e:
-        auth_register('HotGuy420@gmail.com', 'lobo8008135', 'Hayden', 'Smith')
+
+    user1 = auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
+
+    user2 = auth_register('C00LGUY@hotmail.com', 'aVeryC00lguy', 'Bruce', 'Willis')
+
+    user3 = auth_register('z9398627@unsw.edu.au', 'Shr3k15lyfe', 'Mickey', 'Mouse')
 
     with pytest.raises(InputError) as e:
-        auth_register('C00LGUY@hotmail.com', 'KingJames23', 'Lebron', 'James')
+        user1_1 = auth_register('HotGuy420@gmail.com', 'lobo8008135', 'Hayden', 'Smith')
 
     with pytest.raises(InputError) as e:
-        auth_register('z9398627@unsw.edu.au', 'UKDrill0G', 'Stormzy', 'RapGod')
+        user2_1 = auth_register('C00LGUY@hotmail.com', 'KingJames23', 'Lebron', 'James')
+
+    with pytest.raises(InputError) as e:
+        user3_1 = auth_register('z9398627@unsw.edu.au', 'UKDrill0G', 'Stormzy', 'RapGod')
 
 def test_registerFirstName():
 
