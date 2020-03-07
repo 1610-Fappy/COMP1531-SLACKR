@@ -1,12 +1,12 @@
 from src.auth import auth_login, auth_register
 from src.channels import channels_create
-from src.channel import channel_join, channel_details
+from src.channel import channel_join, channel_details, channel_addowner
 from src.message import message_send, message_remove
 import pytest
 from src.error import InputError, AccessError
 
 # Given a message_id for a message, this message is removed from the channel
-def test_message_remove():
+def test_message_remove1a():
 
     # User 1 creates a channel
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
@@ -22,6 +22,34 @@ def test_message_remove():
 
     # User 1 is able to delete a message in Channel 1 because they are the admin/owner
     assert(message_remove(user1_token, ID_of_message) == {})
+
+# Testing if User 2 who is made admin/owner can remove a message
+def test_message_remove1b():
+
+    # User 1 creates a channel
+    auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
+
+    user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
+    user1_token = user1_login['token']
+
+    channel_1 = channels_create(user1_token, 'Channel 1', True)
+
+    # User 1 sends a message in Channel 1
+    test_message = "It Aint How Hard You Hit...Its How Hard You Can Get Hit and Keep Moving Forward. Its About How Much You Can Take And Keep Moving Forward"
+    ID_of_message = message_send(user1_token, channel_1, test_message)
+
+    # User 2 logins, joins Channel 1 and is made admin/owner
+    auth_register('C00LGUY@hotmail.com', 'aVeryC00lguy', 'Bruce', 'Willis')
+
+    user2_login = auth_login('C00LGUY@hotmail.com', 'aVeryC00lguy')
+    user2_token = user2_login['token']
+    user2_id = user2_login['u_id']
+
+    channel_join(user2_token, channel_1)
+    channel_addowner(user1_token, channel_1, user2_id)
+
+    # User 2 edits User 1's message and is able to because they are now an admin/owner
+    assert(message_remove(user2_token, ID_of_message) == {})
 
 # InputError when any of: 
 #   Message (based on ID) no longer exists
