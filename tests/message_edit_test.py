@@ -152,7 +152,7 @@ def test_message_edit_except2a():
         message_edit(user1_token, ID_of_message, too_much_message)
 
 # AccessError - invalid token
-def message_edit_AccessError():
+def test_message_edit_AccessError():
 
     # User 1 creates a channel
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
