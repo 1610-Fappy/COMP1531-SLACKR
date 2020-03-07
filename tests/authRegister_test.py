@@ -1,6 +1,6 @@
 from src.auth import auth_register
 import pytest
-from error import InputError
+from src.error import InputError
 
 
 '''
