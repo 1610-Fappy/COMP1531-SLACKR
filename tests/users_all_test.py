@@ -28,4 +28,11 @@ def test_users_all1c():
 
     assert(users_all(user1_token))
 
+# AccessError - invalid token
+def users_all_AccessError():
+
+    # Error thrown when token passed in users_all is not a valid token
+    with pytest.raises(AccessError) as e:
+        users_all('invalidtoken')
+
 
