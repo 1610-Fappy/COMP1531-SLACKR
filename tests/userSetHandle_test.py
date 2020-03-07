@@ -6,13 +6,13 @@ from src.auth import auth_register
 def test_setHandle():
 
     user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Great', 'Khali')
-    user_profile_sethandle(user1['token'], 'thebigman')
+    assert(user_profile_sethandle(user1['token'], 'thebigman'))
 
     user2 = auth_register('goodestman@hotmail.com', 'hello1234', 'Jim', 'Carrey')
-    user_profile_sethandle(user2['token'], 'funnyman')
+    assert(user_profile_sethandle(user2['token'], 'funnyman'))
 
     user3 = auth_register('overtime@gmail.com', 'hello1234', 'Light', 'Bulb')
-    user_profile_sethandle(user3['token'], 'PixarLamp')
+    assert(user_profile_sethandle(user3['token'], 'PixarLamp'))
 
 def test_invalidHandleLength():
 
