@@ -1,8 +1,8 @@
 from src.channel import channel_join
 from src.auth import auth_register, auth_login
 from src.channels import channels_create
-import pytest
 from src.error import InputError, AccessError
+import pytest
 
 def testing_channel_join():
     User1 = auth_register('C00lguy@gmail.com', 'SickM0de', 'Sicko', 'Mode')
