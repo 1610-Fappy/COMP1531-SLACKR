@@ -54,7 +54,7 @@ def test_search1b():
     assert(search(user2_token, "m"))
 
 # AccessError - invalid token
-def search_AccessError():
+def test_search_AccessError():
     # User 1 creates a channel
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
 
