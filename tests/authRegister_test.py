@@ -11,11 +11,11 @@ ASSUMPTIONS
 '''
 def test_register():
 
-    user1 = auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
+    assert(auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone')) 
 
-    user2 = auth_register('C00LGUY@hotmail.com', 'aVeryC00lguy', 'Bruce', 'Willis')
+    assert(auth_register('C00LGUY@hotmail.com', 'aVeryC00lguy', 'Bruce', 'Willis'))
 
-    user3 = auth_register('z9398627@unsw.edu.au', 'Shr3k15lyfe', 'Mickey', 'Mouse')
+    assert(auth_register('z9398627@unsw.edu.au', 'Shr3k15lyfe', 'Mickey', 'Mouse'))
 
 def test_registerShortPassword():
 
