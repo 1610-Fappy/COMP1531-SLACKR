@@ -74,6 +74,11 @@ def test_channels_list_AccessError():
 
     user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
     user1_token = user1_login['token']
+    
+    channels_create(user1_token, 'Channel 1', True)
+    channels_create(user1_token, 'Channel 2', True)
+    channels_create(user1_token, 'Channel 3', True)
+    channels_create(user1_token, 'Channel 4', True)
 
     # Error thrown when token passed in channels_list is not a valid token
     with pytest.raises(AccessError) as e:
