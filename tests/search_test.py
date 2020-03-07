@@ -51,3 +51,22 @@ def test_search1b():
     # User 2 searches
     assert(search(user2_token, "m"))
 
+# AccessError - invalid token
+def search_AccessError():
+    # User 1 creates a channel
+    auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
+
+    user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
+    user1_token = user1_login['token']
+
+    channel_1 = channels_create(user1_token, 'Channel 1', True)
+
+    # User 1 sends a bunch of single character messages to Channel 1
+    test_message = "I am Walt Disney in disguise. We keep moving forward, opening new doors, and doing new things, because we're curious and curiosity keeps leading us down new paths. I only hope that we never lose sight of one thing — that it was all started by a mouse."
+    for c in test_message:
+        message_send(user1_token, channel_1, c)
+
+    # Error thrown when token passed in search is not a valid token
+    with pytest.raises(AccessError) as e:
+        search('invalidtoken', "m")
+
