@@ -48,7 +48,7 @@ def test_search1b():
     user2_login = auth_login('z9398627@unsw.edu.au', 'Shr3k15lyfe')
     user2_token = user2_login['token']
     
-    channel_join(user2_login, channel_1)
+    channel_join(user2_token, channel_1)
 
     # User 2 searches
     assert(search(user2_token, "m"))
