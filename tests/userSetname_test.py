@@ -1,4 +1,4 @@
-from error import InputError
+from src.error import InputError
 import pytest
 from src.user import user_profile_setname
 from src.auth import auth_register
