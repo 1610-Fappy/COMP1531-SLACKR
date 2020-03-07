@@ -109,3 +109,22 @@ def test_channel_messages_except2a():
     # channel_messages fails when User 2 is not a member of Channel 1
     with pytest.raises(AccessError) as e:
         channel_messages(user2_token, channel_1, 0)
+
+# AccessError - invalid token
+def channel_messages_AccessError():
+
+    # User 1 creates a channel
+    auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
+
+    user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
+    user1_token = user1_login['token']
+
+    channel_1 = channels_create(user1_token, 'Channel 1', True)
+
+    # User 1 sends 1 message in Channel 1
+    test_message = "I am Walt Disney in disguise. We keep moving forward, opening new doors, and doing new things, because we're curious and curiosity keeps leading us down new paths. I only hope that we never lose sight of one thing — that it was all started by a mouse."
+    message_send(user1_token, channel_1, test_message)
+
+    # Error thrown when token passed in channel_messages is not a valid token
+    with pytest.raises(AccessError) as e:
+        channel_messages('invalidtoken', channel_1, 0)
