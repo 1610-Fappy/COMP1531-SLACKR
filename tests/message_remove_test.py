@@ -160,7 +160,7 @@ def test_message_remove_except2b():
         message_remove(user2_token, ID_of_message)
 
 # AccessError - invalid token
-def message_remove_AccessError():
+def test_message_remove_AccessError():
 
     # User 1 creates a channel
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
