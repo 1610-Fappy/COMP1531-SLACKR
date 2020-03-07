@@ -100,7 +100,7 @@ def test_message_send_except2():
         message_send(user2_token, channel_1, test_message)
 
 # AccessError - invalid token
-def message_send_AccessError():
+def test_message_send_AccessError():
 
     # User 1 creates a channel
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
