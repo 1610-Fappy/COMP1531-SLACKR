@@ -7,7 +7,7 @@ from src.error import InputError, AccessError
 
 # Provide a list of all channels (and their associated details) that the authorised user is part of
 def test_channels_list1a():
-    # User 1 creates a channel
+    # User 1 creates 4 channels
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
 
     user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
@@ -44,7 +44,7 @@ def test_channels_list1a():
 
 # Testing that channels_list will show channels that only the user is apart of
 def test_channels_list1b():
-    # User 1 creates a channel
+    # User 1 creates 4 channels
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
 
     user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
@@ -69,7 +69,7 @@ def test_channels_list1b():
     
 # AccessError - invalid token
 def test_channels_list_AccessError():
-    # User 1 creates a channel
+    # User 1 creates 4 channels
     auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
 
     user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
