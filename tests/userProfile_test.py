@@ -1,4 +1,4 @@
-from error import InputError
+from src.error import InputError
 from src.user import user_profile
 from src.auth import auth_register, auth_login, auth_logout
 import pytest
