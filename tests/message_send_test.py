@@ -98,3 +98,18 @@ def test_message_send_except2():
     test_message = "Yippie-Kai-Yay..."
     with pytest.raises(AccessError) as e:
         message_send(user2_token, channel_1, test_message)
+
+# AccessError - invalid token
+def message_send_AccessError():
+
+    # User 1 creates a channel
+    auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone') 
+
+    user1_login = auth_login('HotGuy420@gmail.com', 'verySecureP@55word')
+    user1_token = user1_login['token']
+
+    channel_1 = channels_create(user1_token, 'Channel 1', True)
+
+    # Error thrown when token passed in message_send is not a valid token
+    with pytest.raises(AccessError) as e:
+        message_send('invalidtoken', channel_1, '1v1 me boxing')
