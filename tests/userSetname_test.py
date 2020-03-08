@@ -1,7 +1,7 @@
-from src.error import InputError
+from src.error import InputError, AccessError
 import pytest
 from src.user import user_profile_setname
-from src.auth import auth_register
+from src.auth import auth_register, auth_logout
 
 def test_changeFirstName():
 
@@ -53,3 +53,19 @@ def test_invalidLastName():
     user3 = auth_register('coolguy@gmail.com', 'hello1234', 'Bomber', 'Man')
     with pytest.raises(InputError) as e:
         user_profile_setname(user3['token'], 'Bomber', 'Guy213123')
+
+def test_validToken():
+    user1 = auth_register('knight360@gmail.com', 'hello1234', 'Michael', 'Jordan')
+    auth_logout(user1['token'])
+    with pytest.raises(AccessError) as e:
+        user_profile_setname(user1['token'], 'Lebron', 'Jordan')
+
+    user2 = auth_register('steph@hotmail.com', 'hello1234', 'Stephen', 'Curry')
+    auth_logout(user2['token'])
+    with pytest.raises(AccessError) as e:
+        user_profile_setname(user2['token'], 'Lebron', 'Jordan')
+
+    user3 = auth_register('coolguy@gmail.com', 'hello1234', 'Bomber', 'Man')
+    auth_logout(user3['token'])
+    with pytest.raises(AccessError) as e:
+        user_profile_setname(user3['token'], 'Mr', 'Man')
