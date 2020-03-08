@@ -1,7 +1,7 @@
-from src.error import InputError
+from src.error import InputError, AccessError
 import pytest
 from src.user import user_profile_setemail
-from src.auth import auth_register
+from src.auth import auth_register, auth_logout
 
 def test_setEmail():
 
@@ -41,3 +41,20 @@ def test_emailUsed():
 
     with pytest.raises(InputError) as e:
         user_profile_setemail(user3['token'], 'bigman@gmail.com')
+
+def test_validToken():
+
+    user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Michael', 'Jordan')
+    auth_logout(user1['token'])
+    with pytest.raises(AccessError) as e:
+        user_profile_setemail(user1['token'], 'bigguy@gmail.com')
+
+    user2 = auth_register('spoolguy@hotmail.com', 'hello1234', 'Jason', 'Dabestani')
+    auth_logout(user2['token'])
+    with pytest.raises(AccessError) as e:
+        user_profile_setemail(user2['token'], 'knight360@hotmail.com')
+    
+    user3 = auth_register('lebronJames@gmail.com', 'hello1234', 'Rahul', 'Submarine')
+    auth_logout(user3['token'])
+    with pytest.raises(AccessError) as e:
+        user_profile_setemail(user3['token'], 'Stephcurry@gmail.com')
