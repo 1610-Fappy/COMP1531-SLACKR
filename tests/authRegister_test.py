@@ -9,6 +9,8 @@ ASSUMPTIONS
 * IF EMAIL IN FORMAT SOMEONE@DOMAIN.COM, SOMEONE MUST NOT HAVE A ' ' BETWEEN ITS CHARACTERS
 * NAMES WILL NOT HAVE DIGITS IN THEM
 '''
+
+#Testing case when everything is valid
 def test_register():
 
     assert(auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone')) 
@@ -17,6 +19,7 @@ def test_register():
 
     assert(auth_register('z9398627@unsw.edu.au', 'Shr3k15lyfe', 'Mickey', 'Mouse'))
 
+#Testing when password is too short
 def test_registerShortPassword():
 
     with pytest.raises(InputError) as e:
@@ -41,6 +44,7 @@ def test_registerValidPassword():
     with pytest.raises(InputError) as e:
         auth_register('thegreatwizard@unsw.edu.au', 'YOUSHALLNOTPASS', 'Gandalf', 'Great')
 
+#Testing for valid email
 def test_registerValidEmail():
 
     #Testing for valid format
@@ -78,6 +82,7 @@ def test_registerEmailUsed():
     with pytest.raises(InputError) as e:
         user3_1 = auth_register('z9398627@unsw.edu.au', 'UKDrill0G', 'Stormzy', 'RapGod')
 
+#Testing that the first name is valid
 def test_registerFirstName():
 
     with pytest.raises(InputError) as e:
@@ -90,6 +95,7 @@ def test_registerFirstName():
     with pytest.raises(InputError) as e:
         auth_register('numbername@unsw.edu.au', 'd1g1tNames', 'w3ird', 'name')
 
+#Testing that last name is valid
 def test_registerLastName():
 
     with pytest.raises(InputError) as e:
