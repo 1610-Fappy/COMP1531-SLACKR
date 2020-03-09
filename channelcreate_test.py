@@ -2,7 +2,7 @@ from src.channel import channel_invite
 from src.channels import channels_create
 from src.auth import auth_register
 import pytest
-from src.error import InputError
+from src.error import InputError, AccessError
 
 
 def test_channel_create():
@@ -25,3 +25,7 @@ def test_channel_create():
     Youtuber = auth_register('Youtube@gmail.com', 'MyYtAccountWillN0tBeHacked', 'You', 'Tube')
     with pytest.raises(InputError) as e:
         channels_create(Youtuber['Token'], 'MyChannel1sT00C001T0FitInTheLetterRestriction', True)
+
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channels_create('InvalidToken', 'MyAwesomeChannel', True)
