@@ -3,17 +3,19 @@ import pytest
 from src.user import user_profile_setemail
 from src.auth import auth_register, auth_logout
 
+#Testing that everything works when valid
 def test_setEmail():
 
     user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Michael', 'Jordan')
-    user_profile_setemail(user1['token'], 'bigguy@gmail.com')
+    assert(user_profile_setemail(user1['token'], 'bigguy@gmail.com'))
 
     user2 = auth_register('spoolguy@hotmail.com', 'hello1234', 'Jason', 'Dabestani')
-    user_profile_setemail(user2['token'], 'knight360@hotmail.com')
+    assert(user_profile_setemail(user2['token'], 'knight360@hotmail.com'))
 
     user3 = auth_register('lebronJames@gmail.com', 'hello1234', 'Rahul', 'Submarine')
-    user_profile_setemail(user3['token'], 'Stephcurry@gmail.com')
+    assert(user_profile_setemail(user3['token'], 'Stephcurry@gmail.com'))
 
+#Testinmg when email is invalid for use
 def test_invalidEmail():
 
     user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Michael', 'Jordan')
@@ -28,6 +30,7 @@ def test_invalidEmail():
     with pytest.raises(InputError) as e:
         user_profile_setemail(user3['token'], 'Stephcurry.com')
 
+#Testing if the email is already in use
 def test_emailUsed():
 
     user1 = auth_register('bigman@gmail.com', 'hello1234', 'Jason', 'Dabestani')
@@ -42,6 +45,7 @@ def test_emailUsed():
     with pytest.raises(InputError) as e:
         user_profile_setemail(user3['token'], 'bigman@gmail.com')
 
+#Testing if the token is still valid
 def test_validToken():
 
     user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Michael', 'Jordan')
