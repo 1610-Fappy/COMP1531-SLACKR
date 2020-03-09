@@ -30,3 +30,7 @@ def channel_add_owner_testing():
     # Produce an access error when member tries to add someone as owner
     with pytest.raises(AccessError) as e:
         channel_addowner(User4['Token'], Channel1['channel_id'], User3['u_id'])
+
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channel_addowner('InvalidToken', Channel1['channel_id'], User3['u_id'])
