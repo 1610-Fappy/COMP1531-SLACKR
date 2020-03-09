@@ -5,6 +5,8 @@ import pytest
 from src.error import InputError, AccessError
 
 def channel_leave_testing():
+    
+    # Assume channel_id returns an integer that is positive
     # First register a user
     FirstUser = auth_register('FirstUser@gmail.com', 'TheF1rstUser', 'First', 'User')
 
@@ -31,7 +33,6 @@ def channel_leave_testing():
     with pytest.raises(AccessError) as e:
         channel_leave(FourthUser['Token'], NewChannel['channel_id'])
 
-
     # More tests with different channels
     First = auth_register('First@gmail.com', 'Y0ndaime', 'Hashirama', 'Senju')
     Mokuton = channels_create(First['Token'], 'Mokuton', True)
@@ -42,8 +43,10 @@ def channel_leave_testing():
     channel_leave(Second['Token'], Mokuton['channel_id'])
     channel_invite(First['Token'], Mokuton['channel_id'], Fifth['u_id'])
 
+    # Same test as InputError test above
     with pytest.raises(InputError) as e:
-        channel_leave(Fifth['Token'], '-1')
+        channel_leave(Fifth['Token'], '-2')
 
+    # Same test as AccessError test above
     with pytest.raises(AccessError) as e:
         channel_leave(Sixth['Token'], Mokuton['channel_id'])
