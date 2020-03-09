@@ -34,3 +34,7 @@ def channel_remove_owner_testing():
     # Produce AccessError when person removing ownership is not an owner
     with pytest.raises(AccessError) as e:
         channel_removeowner(User5['Token'], Channel1['channel_id'], User3['u_id'])
+
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channel_removeowner('InvalidToken', Channel1['channel_id'], User3['u_id'])
