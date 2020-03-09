@@ -15,7 +15,7 @@ def channeldetails_testing():
     channel_invite(User1['Token'], User1Channel['channel_id'], User2['u_id'])
 
     # Displaying channel details
-    channel_details(User1['Token'], User1Channel['channel_id'])
+    assert channel_details(User1['Token'], User1Channel['channel_id'])
 
     # Creating user that is not in server
     User3 = auth_register('User3@gmail.com', 'User3Pa55', 'User', 'Three')
@@ -27,3 +27,7 @@ def channeldetails_testing():
     # Use User3 token to produce an access error because User 3 is not in channel
     with pytest.raises(AccessError) as e:
         channel_details(User3['Token'], User1Channel['channel_id'])
+
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channel_details('InvalidToken', User1Channel['channel_id'])
