@@ -1,0 +1,2 @@
+For message_edit and message_send, one test assumes that new memebers who join are not automatically made admin/owner.
+Assumed in testing for channels_listall, User 1 has global access to see all channels but User 2 does not.
