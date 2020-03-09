@@ -11,8 +11,11 @@ def testing_channel_join():
     PrivateChannel = channels_create(User1['Token'], 'MyPrivateChannel', False)
     channel_join(User2['Token'], channel1['channel_id'])
 
+    # Channel id is not valid
     with pytest.raises(InputError) as e:
         channel_join(User2['Token'], '-1')
+    
+    # User2 trying to join a private channel
     with pytest.raises(AccessError) as e:
         channel_join(User2['Token'], PrivateChannel['channel_id'])
 
@@ -20,7 +23,10 @@ def testing_channel_join():
     NotSoCool = auth_register('WishIWasCool@gmail.com', 'BadPass1ame', 'NotSo', 'Cool')
     NewChannel = channels_create(CoolUser['Token'], 'PrivateChannel', False)
 
+    # Joining channel with invalid channel id
     with pytest.raises(InputError) as e:
         channel_join(NotSoCool['Token'], '-1')
+
+    # User tries to join private channel
     with pytest.raises(AccessError) as e:
         channel_join(NotSoCool['Token'], NewChannel['channel_id'])
