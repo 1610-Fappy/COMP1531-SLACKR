@@ -2,7 +2,7 @@ from src.error import InputError, AccessError
 from src.user import user_profile_sethandle
 from src.auth import auth_register, auth_logout
 
-
+#Testing for valid case to set handle
 def test_setHandle():
 
     user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Great', 'Khali')
@@ -14,6 +14,7 @@ def test_setHandle():
     user3 = auth_register('overtime@gmail.com', 'hello1234', 'Light', 'Bulb')
     assert(user_profile_sethandle(user3['token'], 'PixarLamp'))
 
+#Testin when handle length is invalid
 def test_invalidHandleLength():
 
     user1 = auth_register('poopman@gmail.com', 'hello1234', 'Poop', 'Nugget')
@@ -23,6 +24,7 @@ def test_invalidHandleLength():
     with pytest.raises(InputError) as e:
         user_profile_sethandle(user1['token'], 'Thishandlenameiswaytoolongwhatareyouthinking')
 
+#Testing if handle is already in use
 def test_handleUsed():
         
         user1 = auth_register('coolmanguy@gmail.com', 'hello1234', 'Raphael', 'Turtle')
@@ -32,6 +34,7 @@ def test_handleUsed():
         with pytest.raises(InputError) as e:
             user_profile_sethandle(user2['token'], 'coolguy')
 
+#Testing for valid token
 def test_validToken():
 
     user1 = auth_register('coolguy@gmail.com', 'hello1234', 'Great', 'Khali')
