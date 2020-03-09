@@ -5,6 +5,8 @@ from src.channel import channel_removeowner, channel_invite, channel_addowner
 import pytest
 
 def channel_remove_owner_testing():
+
+    # Assume that channel_id and user_id are positive integers. Therefore negative integers in place of any _id will produce an error
     # Registering Users to later be put in channels
     User1 = auth_register('User1@gmail.com', 'User1Pa55', 'User', 'One')
     User2 = auth_register('User2@gmail.com', 'User2Pa55', 'User', 'Two')
@@ -31,4 +33,4 @@ def channel_remove_owner_testing():
 
     # Produce AccessError when person removing ownership is not an owner
     with pytest.raises(AccessError) as e:
-        channel_removeowner(User5['Token'], Channel1['channel_id'], User4['u_id'])
+        channel_removeowner(User5['Token'], Channel1['channel_id'], User3['u_id'])
