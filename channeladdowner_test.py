@@ -11,6 +11,7 @@ def channel_add_owner_testing():
     User3 = auth_register('User3@gmail.com', 'User3Pa55', 'User', 'Three')
     User4 = auth_register('User4@gmail.com', 'User4Pa55', 'User', 'Four')
 
+    # Assumption: Everyone added to the channel by User1 is a member
     # Creating a channel which will be used to transfer ownership
     Channel1 = channels_create(User1['Token'], 'TransferOwnership', True)
     assert(channel_invite(User1['Token'], Channel1['channel_id'], User2['u_id']))
@@ -20,7 +21,7 @@ def channel_add_owner_testing():
 
     # Producing error when channel_id is invalid
     with pytest.raises(InputError) as e:
-        channel_addowner(User1['Token'], '-1', User2['u_id'])
+        channel_addowner(User1['Token'], '-1', User3['u_id'])
 
     # Producing error when user is already an owner
     with pytest.raises(InputError) as e:
