@@ -30,3 +30,7 @@ def testing_channel_join():
     # User tries to join private channel
     with pytest.raises(AccessError) as e:
         channel_join(NotSoCool['Token'], NewChannel['channel_id'])
+    
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channel_join('InvalidToken', channel1['channel_id'])
