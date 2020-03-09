@@ -50,3 +50,7 @@ def channel_leave_testing():
     # Same test as AccessError test above
     with pytest.raises(AccessError) as e:
         channel_leave(Sixth['Token'], Mokuton['channel_id'])
+
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channel_leave('InvalidToken', Mokuton['channel_id'])
