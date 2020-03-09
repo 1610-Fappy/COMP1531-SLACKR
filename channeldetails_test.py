@@ -10,13 +10,17 @@ def channeldetails_testing():
     
     # Creating a channel using User1
     User1Channel = channels_create(User1['Token'], 'User1Channel', True)
+
     # Adding User2 to the created channel
     channel_invite(User1['Token'], User1Channel['channel_id'], User2['u_id'])
+
     # Displaying channel details
     channel_details(User1['Token'], User1Channel['channel_id'])
+
     # Creating user that is not in server
     User3 = auth_register('User3@gmail.com', 'User3Pa55', 'User', 'Three')
 
+    # Produce error because channel id is invalid
     with pytest.raises(InputError) as e:
         channel_details(User1['Token'], '-1')
 
