@@ -27,3 +27,7 @@ def testing_channel_invite():
     # Person inviting is not a member of the channel
     with pytest.raises(AccessError) as e:
         channel_invite(User5['Token'], Channel1['channel_id'], User4['u_id'])
+
+    # Produce AccessError when token passed is invalid
+    with pytest.raises(AccessError) as e:
+        channel_invite('InvalidToken', Channel1['channel_id'], User4['u_id'])
