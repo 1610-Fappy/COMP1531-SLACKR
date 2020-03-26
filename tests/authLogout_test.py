@@ -6,13 +6,16 @@ from src.auth import auth_register, auth_logout
 def test_logout():
 
     user1 = auth_register('HotGuy420@gmail.com', 'verySecureP@55word', 'Sylvester', 'Stallone')
-    assert(auth_logout(user1['token']))
+    user1Logout = auth_logout(user1)
+    assert(user1Logout['is_success'] == True)
 
     user2 = auth_register('C00LGUY@hotmail.com', 'aVeryC00lguy', 'Bruce', 'Willis')
-    assert(auth_logout(user2['token']))
+    user2Logout = auth_logout(user2)
+    assert(user2Logout['is_success'] == True)
 
     user3 = auth_register('z9398627@unsw.edu.au', 'Shr3k15lyfe', 'Mickey', 'Mouse')
-    assert(auth_logout(user3['token']))
+    user3Logout = auth_logout(user3)
+    assert(user3Logout['is_success'] == True)
 
 def test_invalidToken():
 
