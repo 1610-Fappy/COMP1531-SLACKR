@@ -1,5 +1,6 @@
 from src.auth import auth_login, auth_register
 from src.channels import channels_create
+from src.channel import channel_join
 from src.message import message_send
 import pytest
 from src.error import InputError, AccessError
