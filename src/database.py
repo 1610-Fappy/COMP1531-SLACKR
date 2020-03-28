@@ -6,6 +6,11 @@ DATA_STRUCTURE = {
             'name': ''
         }
     ]
+    'user': [
+        {
+            
+        }
+    ]
 }
 
 with open('database.p', 'wb') as FILE:
