@@ -1,14 +1,40 @@
 ''' General Helper Functions'''
 import re
 import jwt
+from database import get_data
 
 SECRET = 'DaddyItachi'
 
-def generate_token(user):
+def generate_token(user_id):
     ''' Generates a token for user with given email'''
     global SECRET
-    encoded = jwt.encode(user['email'], SECRET, algorithm='HS256')
+    encoded = jwt.encode({'u_id', user_id}, SECRET, algorithm='HS256')
     return str(encoded)
+
+def decode_token(token):
+    ''' Decodes a token to access user details'''
+    global SECRET
+    decoded = jwt.decode(token, SECRET, algorithms='HS256')
+    return str(decoded)
+
+def get_user(user_id):
+    ''' Gets user using given u_id'''
+    data = get_data()
+    index = 0
+    for user in data['user']:
+        if user['u_id'] == user_id:
+            return index
+        index += 1
+    print("else error for invalid user_id")
+
+def valid_token(token):
+    ''' Checks if token is valid'''
+    data = get_data()
+    for active_token in data['active_tokens']:
+        if token == active_token:
+            return True
+
+    return False
 
 def valid_name(name):
     ''' Checks that the name inputted is valid'''

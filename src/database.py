@@ -1,12 +1,11 @@
-import pickle
+''' File to store data'''
 
-DATA_STRUCTURE = {
-    'channel': [
-        {
-            'name': ''
-        }
-    ]
+DATA = {
+    'users' : [],
+    'active_tokens' : []
 }
 
-with open('database.p', 'wb') as FILE:
-    pickle.dump(DATA_STRUCTURE, FILE)
+def get_data():
+    ''' Access global data from one point'''
+    global DATA
+    return DATA
