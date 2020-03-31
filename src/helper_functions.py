@@ -8,7 +8,7 @@ SECRET = 'DaddyItachi'
 def generate_token(user_id):
     ''' Generates a token for user with given email'''
     global SECRET
-    encoded = jwt.encode({'u_id', user_id}, SECRET, algorithm='HS256')
+    encoded = jwt.encode({'u_id' : user_id}, SECRET, algorithm='HS256')
     return str(encoded)
 
 def generate_channelid(channel_name):
