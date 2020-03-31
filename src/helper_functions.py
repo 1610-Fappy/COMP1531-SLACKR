@@ -11,6 +11,12 @@ def generate_token(user_id):
     encoded = jwt.encode({'u_id', user_id}, SECRET, algorithm='HS256')
     return str(encoded)
 
+def generate_channelid(channel_name):
+    ''' Generates a channel id for channel'''
+    global SECRET
+    encoded = jwt.encode({'channel_id' : channel_name}, SECRET, algorithm='HS256')
+    return str(encoded)
+
 def decode_token(token):
     ''' Decodes a token to access user details'''
     global SECRET
@@ -25,7 +31,17 @@ def get_user(user_id):
         if user['u_id'] == user_id:
             return index
         index += 1
-    print("else error for invalid user_id")
+    return -1
+
+def get_channel(channel_id):
+    ''' Gets channel with given channel id'''
+    data = get_data()
+    index = 0
+    for channel in data['channels']:
+        if channel_id == channel['channel_id']:
+            return index
+        index += 1
+    print("Else error for invalid channel_id")
 
 def valid_token(token):
     ''' Checks if token is valid'''
@@ -36,14 +52,22 @@ def valid_token(token):
 
     return False
 
+def valid_channelid(channel_id):
+    ''' Checks if channel_id is valid'''
+    data = get_data()
+    for channel in data['channels']:
+        if channel_id == channel['channel_id']:
+            return True
+
+    return False
+
 def valid_name(name):
     ''' Checks that the name inputted is valid'''
     name_length = len(name)
-    if name_length >= 1 and name_length <= 50:
+    if 1 <= name_length <= 50:
         return True
-    else:
-        print("Error for name being too long")
-        return False
+
+    return False
 
 def check_username(username):
     ''' Checks username is not already in use'''

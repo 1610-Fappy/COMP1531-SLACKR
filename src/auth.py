@@ -4,29 +4,25 @@ import re
 import uuid
 from helper_functions import generate_token, valid_name, check_username, correct_pass
 from helper_functions import unused_email, valid_email
-
-DATA = {
-    'users' : [],
-    'active_tokens' : []
-}
-
-def get_data():
-    ''' Access global data from one point'''
-    global DATA
-    return DATA
+from database import get_data
 
 def auth_login(email, password):
     ''' Logs in a user'''
+    data = get_data()
     check_email = valid_email(email) and not unused_email(email)
     if check_email:
         check_password = correct_pass(email, hash_pass(password))
+    else:
+        return "invalid email"
     if check_password['correct?']:
-        token = generate_token(email)
+        token = generate_token(get_userid(email))
         data['active_tokens'].append(token)
         return {
             'u_id' : check_password['user']['u_id'],
             'token' : token
         }
+    else:
+        return "invalid password"
 
 
 def auth_register(email, password, name_first, name_last):
@@ -37,15 +33,19 @@ def auth_register(email, password, name_first, name_last):
     check_names = valid_name(name_first) and valid_name(name_last)
     if check_email and check_psswrd and check_names:
         user = get_user_dict(email, password, name_first, name_last)
-        token = generate_token(email)
+        token = generate_token(user['u_id'])
         data['users'].append(user)
         data['active_tokens'].append(token)
         return {
             'u_id' : user['u_id'],
             'token' : token
         }
-    else:
-        print("Error for whatever input needs to be corrected")
+    elif not check_email:
+        return "invalid email"
+    elif not check_psswrd:
+        return "invalid password"
+    elif not check_names:
+        return "invalid name_length"
 
 def auth_logout(token):
     ''' Logs out a user and invalidates the token'''
@@ -59,6 +59,13 @@ def auth_logout(token):
     return{
         'is_success' : False
     }
+
+def get_userid(email):
+    ''' Gets user id using email to search'''
+    data = get_data()
+    for user in data['users']:
+        if email == user['email']:
+            return user['u_id']
 
 def get_user_dict(email, password, name_first, name_last):
     ''' Stores user details into dictionary'''
@@ -79,11 +86,10 @@ def generate_u_id():
 def valid_password(password):
     ''' Checks that the password is valid'''
     passwrd_length = len(password)
-    if re.search('[a-zA-Z0-9]', password) and passwrd_length >= 6:
+    if re.search('[a-zA-Z]', password) and passwrd_length >= 6 and re.search('[0-9]', password):
         return True
-    else:
-        print("Return password needs to be more secure")
-        return False
+
+    return False
 
 def hash_pass(password):
     ''' Hashes password to be stored securely'''

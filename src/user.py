@@ -14,7 +14,7 @@ def user_setname(token, name_first, name_last):
         data['users'][index]['first_name'] = name_first
         data['users'][index]['last_name'] = name_last
     else:
-        print("Add error for invalid name")
+        return "invalid name_length"
 
 def user_setemail(token, email):
     ''' Function for user to change email'''
@@ -23,9 +23,13 @@ def user_setemail(token, email):
     email_unused = unused_email(email)
     email_valid = valid_email(email)
 
-    if email_valid and email_unused:
+    if email_valid and email_unused and valid_token(token):
         index = get_user(user_id)
         data['users'][index]['email'] = email
+    elif not email_valid or not email_unused:
+        return "invalid token"
+    else:
+        return "invalid email"
 
 def user_sethandle(token, handle_str):
     ''' Function for user to change username'''
@@ -33,22 +37,32 @@ def user_sethandle(token, handle_str):
     user_id = decode_token(token)
     valid_handle = check_handlelength(handle_str)
 
-    if valid_handle:
+    if valid_handle and valid_token(token):
         index = get_user(user_id)
         data['users'][index]['username'] = handle_str
+    elif not valid_handle:
+        return "invalid username"
+    else:
+        return "invalid token"
 
 def user_profile(token, u_id):
     ''' Function to return users profile'''
     data = get_data()
     index = get_user(u_id)
-    if valid_token(token):
+    if valid_token(token) and index != -1:
         return data['users'][index]
+    elif index == -1:
+        return "invalid u_id"
+    else:
+        return "invalid token"
 
 def user_all(token):
     ''' Function that returns a list of all users and details'''
     data = get_data()
     if valid_token(token):
         return data['users']
+    else:
+        return "invalid token"
 
 def check_handlelength(handle_str):
     ''' Checks that handle is within specified range'''
