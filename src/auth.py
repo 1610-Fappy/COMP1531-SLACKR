@@ -9,11 +9,15 @@ from database import get_data
 def auth_login(email, password):
     ''' Logs in a user'''
     data = get_data()
-    check_email = valid_email(email) and not unused_email(email)
-    if check_email:
+    check_valid_email = valid_email(email) 
+    check_unused_email = unused_email(email)
+    if check_valid_email and not check_unused_email:
         check_password = correct_pass(email, hash_pass(password))
     else:
-        return "invalid email"
+        if not check_valid_email:
+            return "invalid email"
+        if check_unused_email:
+            return "unused email"
     if check_password['correct?']:
         token = generate_token(get_userid(email))
         data['active_tokens'].append(token)
@@ -28,10 +32,11 @@ def auth_login(email, password):
 def auth_register(email, password, name_first, name_last):
     ''' Registers a user'''
     data = get_data()
-    check_email = unused_email(email) and valid_email(email)
+    check_valid_email = valid_email(email)
+    check_unused_email = unused_email(email)
     check_psswrd = valid_password(password)
     check_names = valid_name(name_first) and valid_name(name_last)
-    if check_email and check_psswrd and check_names:
+    if check_valid_email and check_psswrd and check_names and check_unused_email:
         user = get_user_dict(email, password, name_first, name_last)
         token = generate_token(user['u_id'])
         data['users'].append(user)
@@ -40,8 +45,10 @@ def auth_register(email, password, name_first, name_last):
             'u_id' : user['u_id'],
             'token' : token
         }
-    elif not check_email:
+    elif not check_valid_email:
         return "invalid email"
+    elif not check_unused_email:
+        return "used email"
     elif not check_psswrd:
         return "invalid password"
     elif not check_names:
@@ -50,8 +57,8 @@ def auth_register(email, password, name_first, name_last):
 def auth_logout(token):
     ''' Logs out a user and invalidates the token'''
     data = get_data()
-    for user_token in data['users']:
-        if user_token['token'] == token:
+    for user_token in data['active_tokens']:
+        if user_token == token:
             data['active_tokens'].remove(token)
             return {
                 'is_success' : True
@@ -81,7 +88,7 @@ def get_user_dict(email, password, name_first, name_last):
 
 def generate_u_id():
     ''' Generates unique user id'''
-    return uuid.uuid4()
+    return str(uuid.uuid4())
 
 def valid_password(password):
     ''' Checks that the password is valid'''
