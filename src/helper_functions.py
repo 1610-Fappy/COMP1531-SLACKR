@@ -8,7 +8,7 @@ SECRET = 'DaddyItachi'
 def generate_token(user_id):
     ''' Generates a token for user with given email'''
     global SECRET
-    encoded = jwt.encode({'u_id' : user_id}, SECRET, algorithm='HS256')
+    encoded = jwt.encode({'u_id' : user_id}, SECRET, algorithm='HS256').decode("utf-8")
     return str(encoded)
 
 def generate_channelid(channel_name):
@@ -83,7 +83,6 @@ def unused_email(email):
     data = get_data()
     for users_email in data['users']:
         if email == users_email['email']:
-            print("Error, email already in use")
             return False
 
     return True
@@ -103,7 +102,6 @@ def valid_email(email):
     if re.search(regex, email):
         return True
     else:
-        print("Invalid Email")
         return False
 
 def correct_pass(email, password):
