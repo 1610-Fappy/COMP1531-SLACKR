@@ -85,7 +85,8 @@ def get_user_dict(email, password, name_first, name_last):
         'u_id' : generate_u_id(),
         'password' : hash_pass(password),
         'first_name' : name_first,
-        'last_name' : name_last
+        'last_name' : name_last,
+        'channels': []
     }
     return user
 
