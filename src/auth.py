@@ -125,3 +125,4 @@ def generate_username(first_name, last_name):
         username = change_username(username, True)
 
     return username
+    
