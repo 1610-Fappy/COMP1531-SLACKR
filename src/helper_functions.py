@@ -9,7 +9,7 @@ def generate_token(user_id):
     ''' Generates a token for user with given email'''
     global SECRET
     encoded = jwt.encode({'u_id' : user_id}, SECRET, algorithm='HS256')
-    return encoded
+    return str(encoded)
 
 def generate_channelid(channel_name):
     ''' Generates a channel id for channel'''
@@ -21,7 +21,7 @@ def decode_token(token):
     ''' Decodes a token to access user details'''
     global SECRET
     decoded = jwt.decode(token, SECRET, algorithms='HS256')
-    return decoded['u_id']
+    return str(decoded['u_id'])
 
 def get_user(user_id):
     ''' Gets user using given u_id'''

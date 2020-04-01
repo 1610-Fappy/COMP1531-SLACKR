@@ -6,10 +6,12 @@ from helper_functions import valid_channelid, get_channel, decode_token, user_in
 def channel_create(token, name, is_public):
     ''' Creates a channel and returns its id'''
     data = get_data()
+    if not valid_token(token):
+        return "invalid token"
     name_length = len(name)
     user_id = decode_token(token)
     user_index = get_user(user_id)
-    if name_length <= 20 and valid_token(token):
+    if name_length <= 20:
         channel = get_channel_dict(name, is_public)
         index = get_user(token)
         channel['owner_members'].append(data['users'][index])
@@ -17,10 +19,17 @@ def channel_create(token, name, is_public):
         data['users'][user_index]['channels'].append(channel)
         data['channels'].append(channel)
         return {'channel_id' : channel['channel_id']}
+    else:
+        return "invalid channel name_length"
 
 def channel_invite(token, channel_id, u_id):
     ''' Invites a user to a channel'''
     data = get_data()
+    if not valid_token(token):
+        return "invalid token"
+    elif not valid_channelid(channel_id):
+        return "invalid channel_id"
+
     token_user_id = decode_token(token)
     token_user = get_user(token_user_id)
     user_index = get_user(u_id)
@@ -31,12 +40,7 @@ def channel_invite(token, channel_id, u_id):
 
     if user_index == -1:
         return "invalid u_id"
-    elif not valid_token(token):
-        return "invalid token"
-    elif not valid_channelid(channel_id):
-        return "invalid channel_id"
-    
-    if not tokenuser_in_channel:
+    elif not tokenuser_in_channel:
         return "not member"
     elif user_in_channel:
         return "already member"
@@ -44,6 +48,22 @@ def channel_invite(token, channel_id, u_id):
         data['channels'][channel_index]['all_members'].append(data['users'][user_index])
         data['users'][user_index]['channels'].append(data['channels'][channel_index])
 
+def channel_join(token, channel_id):
+    ''' User joins a channel'''
+    data = get_data()
+    if not valid_token(token):
+        return "invalid token"
+    elif not valid_channelid(channel_id):
+        return "invalid channel_id"
+
+    channel_index = get_channel(channel_id)
+    user_id = decode_token(token)
+    user_index = get_user(user_id)
+    if data['channels'][channel_index]['is_public']:
+        data['channels'][channel_index]['users'].append(data['users'][user_index])
+        data['users'][user_index]['channels'].append(data['channels'][channel_index])
+    else:
+        return "not public"
 
 def channel_details(token, channel_id):
     ''' Gives basic details about channel if user is apart of it'''
@@ -52,10 +72,12 @@ def channel_details(token, channel_id):
         return "invalid token"
     elif not valid_channelid(channel_id):
         return "invalid channel_id"
+
     token_id = decode_token(token)
     user_index = get_user(token_id)
     channel_index = get_channel(channel_id)
     in_channel = user_inchannel(user_index, channel_id)
+
     if not in_channel:
         return "not member"
     else:
@@ -81,11 +103,16 @@ def channel_list(token):
 def channel_addowner(token, channel_id, u_id):
     ''' Adds user as an owner of a channel'''
     data = get_data()
+    if not valid_token(token):
+        return "invalid token"
+    elif not valid_channelid(channel_id):
+        return "invalid channel_id"
+
     token_user_id = decode_token(token)
     tokenis_owner = check_userowner(channel_id, token_user_id)
     newuseris_owner = check_userowner(channel_id, u_id)
 
-    if valid_token(token) and valid_channelid(channel_id) and tokenis_owner and not newuseris_owner:
+    if tokenis_owner and not newuseris_owner:
         user_index = get_user(u_id)
         in_channel = user_inchannel(user_index, channel_id)
         channel_index = get_channel(channel_id)
@@ -97,20 +124,20 @@ def channel_addowner(token, channel_id, u_id):
         return "not owner"
     elif newuseris_owner:
         return "already owner"
-    elif not valid_channelid(channel_id):
-        return "invalid channel_id"
-    elif not valid_token(token):
-        return "invalid token"
-
 
 def channel_removeowner(token, channel_id, u_id):
     ''' Removes user from being an owner of a channel'''
     data = get_data()
+    if not valid_token(token):
+        return "invalid token"
+    elif not valid_channelid(channel_id):
+        return "invalid channel_id"
+
     token_user_id = decode_token(token)
     tokenis_owner = check_userowner(channel_id, token_user_id)
     newuseris_owner = check_userowner(channel_id, u_id)
 
-    if valid_token(token) and valid_channelid(channel_id) and tokenis_owner and newuseris_owner:
+    if tokenis_owner and newuseris_owner:
         user_index = get_user(u_id)
         channel_index = get_channel(channel_id)
         data['channels'][channel_index]['owner_members'].remove(data['users'][user_index])
@@ -120,11 +147,6 @@ def channel_removeowner(token, channel_id, u_id):
         return "not owner"
     elif not newuseris_owner:
         return "not owner"
-    elif not valid_channelid(channel_id):
-        return "invalid channel_id"
-    elif not valid_token(token):
-        return "invalid token"
-
 
 def get_channel_dict(name, is_public):
     ''' Stores channels details into dictionary'''
