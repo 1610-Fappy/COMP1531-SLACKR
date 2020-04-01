@@ -27,7 +27,7 @@ def get_user(user_id):
     ''' Gets user using given u_id'''
     data = get_data()
     index = 0
-    for user in data['user']:
+    for user in data['users']:
         if user['u_id'] == user_id:
             return index
         index += 1
@@ -117,3 +117,4 @@ def correct_pass(email, password):
     return {
         'correct?' : False
     }
+
