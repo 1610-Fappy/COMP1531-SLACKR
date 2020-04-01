@@ -79,8 +79,7 @@ def user_all(token):
     data = get_data()
     if valid_token(token):
         return data['users']
-    else:
-        return "invalid token"
+    return "invalid token"
 
 def check_handlelength(handle_str):
     ''' Checks that handle is within specified range'''
