@@ -35,8 +35,9 @@ def auth_register(email, password, name_first, name_last):
     check_valid_email = valid_email(email)
     check_unused_email = unused_email(email)
     check_psswrd = valid_password(password)
-    check_names = valid_name(name_first) and valid_name(name_last)
-    if check_valid_email and check_psswrd and check_names and check_unused_email:
+    check_first_name = valid_name(name_first)
+    check_last_name = valid_name(name_last)
+    if check_valid_email and check_psswrd and check_first_name and check_last_name and check_unused_email:
         user = get_user_dict(email, password, name_first, name_last)
         token = generate_token(user['u_id'])
         data['users'].append(user)
@@ -45,14 +46,16 @@ def auth_register(email, password, name_first, name_last):
             'u_id' : user['u_id'],
             'token' : token
         }
-    elif not check_valid_email:
+    if not check_valid_email:
         return "invalid email"
-    elif not check_unused_email:
+    if not check_unused_email:
         return "used email"
-    elif not check_psswrd:
+    if not check_psswrd:
         return "invalid password"
-    elif not check_names:
-        return "invalid name_length"
+    if not check_first_name:
+        return "invalid first name"
+    if not check_last_name:
+        return "invalid first name"
 
 def auth_logout(token):
     ''' Logs out a user and invalidates the token'''
