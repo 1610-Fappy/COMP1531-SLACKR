@@ -229,7 +229,7 @@ def users_all():
 
     return (
         {
-        "USERS": user_all_return
+        "users": user_all_return
         }
     )
 
