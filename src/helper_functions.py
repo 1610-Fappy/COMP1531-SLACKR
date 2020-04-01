@@ -9,7 +9,7 @@ def generate_token(user_id):
     ''' Generates a token for user with given email'''
     global SECRET
     encoded = jwt.encode({'u_id' : user_id}, SECRET, algorithm='HS256')
-    return str(encoded)
+    return encoded
 
 def generate_channelid(channel_name):
     ''' Generates a channel id for channel'''
@@ -21,7 +21,7 @@ def decode_token(token):
     ''' Decodes a token to access user details'''
     global SECRET
     decoded = jwt.decode(token, SECRET, algorithms='HS256')
-    return str(decoded)
+    return decoded['u_id']
 
 def get_user(user_id):
     ''' Gets user using given u_id'''
@@ -32,6 +32,15 @@ def get_user(user_id):
             return index
         index += 1
     return -1
+
+def user_inchannel(user_index, channel_id):
+    ''' Checks if user is within channel specified'''
+    data = get_data()
+    for channel in data['users'][user_index]['channels']:
+        if channel['channel_id'] == channel_id:
+            return True
+
+    return False
 
 def get_channel(channel_id):
     ''' Gets channel with given channel id'''
@@ -83,7 +92,6 @@ def unused_email(email):
     data = get_data()
     for users_email in data['users']:
         if email == users_email['email']:
-            print("Error, email already in use")
             return False
 
     return True

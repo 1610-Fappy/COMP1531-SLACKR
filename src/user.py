@@ -50,7 +50,7 @@ def user_profile(token, u_id):
     data = get_data()
     index = get_user(u_id)
     if valid_token(token) and index != -1:
-        return data['users'][index]
+        return {'user' : data['users'][index]}
     elif index == -1:
         return "invalid u_id"
     else:
@@ -60,7 +60,7 @@ def user_all(token):
     ''' Function that returns a list of all users and details'''
     data = get_data()
     if valid_token(token):
-        return data['users']
+        return {'users' : data['users']}
     else:
         return "invalid token"
 

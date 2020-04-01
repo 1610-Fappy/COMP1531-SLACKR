@@ -14,11 +14,12 @@ def auth_login(email, password):
         check_password = correct_pass(email, hash_pass(password))
     else:
         return "invalid email"
+
     if check_password['correct?']:
         token = generate_token(get_userid(email))
         data['active_tokens'].append(token)
         return {
-            'u_id' : check_password['user']['u_id'],
+            'u_id' : get_userid(email),
             'token' : token
         }
     else:
@@ -50,8 +51,8 @@ def auth_register(email, password, name_first, name_last):
 def auth_logout(token):
     ''' Logs out a user and invalidates the token'''
     data = get_data()
-    for user_token in data['users']:
-        if user_token['token'] == token:
+    for active_tokens in data['active_tokens']:
+        if active_tokens == token:
             data['active_tokens'].remove(token)
             return {
                 'is_success' : True
@@ -75,13 +76,14 @@ def get_user_dict(email, password, name_first, name_last):
         'u_id' : generate_u_id(),
         'password' : hash_pass(password),
         'first_name' : name_first,
-        'last_name' : name_last
+        'last_name' : name_last,
+        'channels' : []
     }
     return user
 
 def generate_u_id():
     ''' Generates unique user id'''
-    return uuid.uuid4()
+    return str(uuid.uuid4())
 
 def valid_password(password):
     ''' Checks that the password is valid'''
@@ -118,3 +120,7 @@ def generate_username(first_name, last_name):
         username = change_username(username, True)
 
     return username
+
+tokenas = auth_register("email@domain.com", "Password2", "masda", "sada")
+auth_logout(tokenas['token'])
+print(auth_login("email@domain.com", "Password2"))

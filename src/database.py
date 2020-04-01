@@ -1,20 +1,22 @@
 ''' File to store data'''
 
-#user = {
-#    'email' : email,
-#    'username' : generate_username(name_first, name_last),
-#    'u_id' : generate_u_id(),
-#    'password' : hash_pass(password),
-#    'first_name' : name_first,
-#    'last_name' : name_last
-# }
+USER = {
+    'email' : None,
+    'username' : None,
+    'u_id' : None,
+    'password' : None,
+    'first_name' : None,
+    'last_name' : None,
+    'channels' : None,
+    'token' : None
+}
 
-# channel = {
-#   'channel_name' : channel_name,
-#   'channel_id' : generate_channelid(channel_name),
-#   'owner_members' : [],
-#   'all_members' : []
-# }
+CHANNEL = {
+    'channel_name' : None,
+    'channel_id' : None,
+    'owner_members' : None,
+    'all_members' : None
+}
 
 DATA = {
     'users' : [],
