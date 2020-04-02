@@ -389,6 +389,73 @@ def channels_list():
 
     return dumps(channel_list_return)
 
+''' =================== MAKE MEMBER OWNER  =================== '''
+@APP.route("/channel/addowner", methods=['POST'])
+def channels_addowner():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    u_id = payload['u_id']
+
+    channel_addowner_return = channel_addowner(token, channel_id, u_id)
+
+    if channel_addowner_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if channel_addowner_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_addowner_return == "not owner":
+        raise AccessError(description="Authorised user is not an owner")
+    if channel_addowner_return == "already owner":
+        raise AccessError(description="User is already an owner")
+
+    return {}
+
+''' =================== REMOVE OWNER STATUS FROM MEMBER  =================== '''
+@APP.route("/channel/removeowner", methods=['POST'])
+def channels_removeowner():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    u_id = payload['u_id']
+
+    channel_removeowner_return = channel_removeowner(token, channel_id, u_id)
+
+    if channel_removeowner_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if channel_removeowner_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_removeowner_return == "token user not owner":
+        raise AccessError(description="Authorised user is not an owner")
+    if channel_removeowner_return == "not owner":
+        raise AccessError(description="User is not an owner")
+
+    return {}
+
+''' =================== REMOVE OWNER STATUS FROM MEMBER  =================== '''
+@APP.route("/channel/leave", methods=['POST'])
+def channels_leave():
+    pass
+
 
 if __name__ == "__main__":
     APP.run(port=(int(sys.argv[1]) if len(sys.argv) == 2 else 8080), debug=True)
