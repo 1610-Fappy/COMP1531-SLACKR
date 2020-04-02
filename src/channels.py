@@ -2,6 +2,7 @@
 from database import get_data
 from helper_functions import valid_token, generate_channelid, get_user
 from helper_functions import valid_channelid, get_channel, decode_token, user_inchannel
+from auth import get_user_dict
 
 def channel_create(token, name, is_public):
     ''' Creates a channel and returns its id'''
@@ -118,24 +119,39 @@ def channel_addowner(token, channel_id, u_id):
     data = get_data()
     if not valid_token(token):
         return "invalid token"
-    elif not valid_channelid(channel_id):
+    if not valid_channelid(channel_id):
         return "invalid channel_id"
 
     token_user_id = decode_token(token)
-    tokenis_owner = check_userowner(channel_id, token_user_id)
-    newuseris_owner = check_userowner(channel_id, u_id)
+
+
+    token_user_dict_index = get_user(token_user_id)
+    token_user_dict = data['users'][token_user_dict_index]
+
+    user_dict_index = get_user(u_id)
+    user_dict = data['users'][user_dict_index]
+
+    token_username = token_user_dict['username']
+    username = user_dict['username']
+
+    tokenis_owner = check_userowner(channel_id, token_username)
+    newuseris_owner = check_userowner(channel_id, username)
 
     if tokenis_owner and not newuseris_owner:
-        user_index = get_user(u_id)
-        in_channel = user_inchannel(user_index, channel_id)
-        channel_index = get_channel(channel_id)
-        data['channels'][channel_index]['owner_members'].append(data['users'][user_index])
-        if not in_channel:
-            data['channels'][channel_index]['all_members'].append(data['users'][user_index])
+        in_channel = user_inchannel(user_dict_index, channel_id)
 
-    elif not tokenis_owner:
+        channel_index = get_channel(channel_id)
+
+        data['channels'][channel_index]['owner_members'].append(data['users'][user_dict_index]['username'])
+
+        if not in_channel:
+            data['channels'][channel_index]['all_members'].append(data['users'][user_dict_index]['username'])
+            return
+        return
+
+    if not tokenis_owner:
         return "not owner"
-    elif newuseris_owner:
+    if newuseris_owner:
         return "already owner"
 
 def channel_removeowner(token, channel_id, u_id):
@@ -143,22 +159,31 @@ def channel_removeowner(token, channel_id, u_id):
     data = get_data()
     if not valid_token(token):
         return "invalid token"
-    elif not valid_channelid(channel_id):
+    if not valid_channelid(channel_id):
         return "invalid channel_id"
 
     token_user_id = decode_token(token)
-    tokenis_owner = check_userowner(channel_id, token_user_id)
-    newuseris_owner = check_userowner(channel_id, u_id)
+
+    token_user_dict_index = get_user(token_user_id)
+    token_user_dict = data['users'][token_user_dict_index]
+
+    user_dict_index = get_user(u_id)
+    user_dict = data['users'][user_dict_index]
+
+    token_username = token_user_dict['username']
+    username = user_dict['username']
+
+    tokenis_owner = check_userowner(channel_id, token_username)
+    newuseris_owner = check_userowner(channel_id, username)
 
     if tokenis_owner and newuseris_owner:
-        user_index = get_user(u_id)
         channel_index = get_channel(channel_id)
-        data['channels'][channel_index]['owner_members'].remove(data['users'][user_index])
-        data['channels'][channel_index]['all_members'].remove(data['users'][user_index])
+        data['channels'][channel_index]['owner_members'].remove(data['users'][user_dict_index]['username'])
+        # data['channels'][channel_index]['all_members'].remove(data['users'][user_dict_index]['username'])
 
-    elif not tokenis_owner:
-        return "not owner"
-    elif not newuseris_owner:
+    if not tokenis_owner:
+        return "token user not owner"
+    if not newuseris_owner:
         return "not owner"
 
 def get_channel_dict(name, is_public):
@@ -172,13 +197,13 @@ def get_channel_dict(name, is_public):
     }
     return channel
 
-def check_userowner(channel_id, u_id):
+def check_userowner(channel_id, username):
     ''' Checks whether a user is an owner of channel'''
     data = get_data()
     for channel in data['channels']:
         if channel['channel_id'] == channel_id:
             for owners in channel['owner_members']:
-                if owners['u_id'] == u_id:
+                if owners == username:
                     return True
 
     return False
