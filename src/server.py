@@ -39,20 +39,24 @@ def echo():
 ''' =================== REGISTER A USER =================== '''
 @APP.route("/auth/register", methods=['POST'])
 def register():
-    
-    if not request.form.get('email'):
-        raise InputError(description='Email not entered')
-    if not request.form.get('password'):
-        raise InputError(description='Password not entered')
-    if not request.form.get('name_first'):
-        raise InputError(description='First name not entered')
-    if not request.form.get('name_last'):
-        raise InputError(description='Last name not entered')
 
-    email = request.form.get('email')
-    password = request.form.get('password')
-    name_first = request.form.get('name_first')
-    name_last = request.form.get('name_last')
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'email' in payload:
+        raise InputError(description='No email passed')
+    if not 'password' in payload:
+        raise InputError(description='No password passed')
+    if not 'name_first' in payload:
+        raise InputError(description='No name_first passed')
+    if not 'name_last' in payload:
+        raise InputError(description='No name_last passed')
+
+    email = payload['email']
+    password = payload['password']
+    name_first = payload['name_first']
+    name_last = payload['name_last']
 
     register_return = auth_register(email, password, name_first, name_last)
 
@@ -73,13 +77,17 @@ def register():
 @APP.route("/auth/login", methods=['POST'])
 def login():
 
-    if not request.form.get('email'):
-        raise InputError(description='Email not entered')
-    if not request.form.get('password'):
-        raise InputError(description='Password not entered')
+    payload = request.get_json()
 
-    email = request.form.get('email')
-    password = request.form.get('password')
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'email' in payload:
+        raise InputError(description='No email passed')
+    if not 'password' in payload:
+        raise InputError(description='No password passed')
+
+    email = payload['email']
+    password = payload['password']
 
     login_return = auth_login(email, password)
 
