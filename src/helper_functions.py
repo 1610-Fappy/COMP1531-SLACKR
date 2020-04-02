@@ -14,14 +14,14 @@ def generate_token(user_id):
 def generate_channelid(channel_name):
     ''' Generates a channel id for channel'''
     global SECRET
-    encoded = jwt.encode({'channel_id' : channel_name}, SECRET, algorithm='HS256')
+    encoded = jwt.encode({'channel_id' : channel_name}, SECRET, algorithm='HS256').decode("utf-8")
     return str(encoded)
 
 def decode_token(token):
     ''' Decodes a token to access user details'''
     global SECRET
     decoded = jwt.decode(token, SECRET, algorithms='HS256')
-    return str(decoded)
+    return str(decoded['u_id'])
 
 def get_user(user_id):
     ''' Gets user using given u_id'''
@@ -33,6 +33,15 @@ def get_user(user_id):
         index += 1
     return -1
 
+def user_inchannel(user_index, channel_id):
+    ''' Checks if user is within channel specified'''
+    data = get_data()
+    for channel in data['users'][user_index]['channels']:
+        if channel['channel_id'] == channel_id:
+            return True
+
+    return False
+
 def get_channel(channel_id):
     ''' Gets channel with given channel id'''
     data = get_data()
@@ -41,7 +50,7 @@ def get_channel(channel_id):
         if channel_id == channel['channel_id']:
             return index
         index += 1
-    print("Else error for invalid channel_id")
+    # print("Else error for invalid channel_id")
 
 def valid_token(token):
     ''' Checks if token is valid'''

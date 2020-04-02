@@ -2,9 +2,12 @@ import sys
 from json import dumps
 from flask import Flask, request, abort
 from flask_cors import CORS
-from error import InputError
+from error import InputError, AccessError
 from auth import auth_register, auth_login, auth_logout
 from user import user_profile, user_setname, user_setemail, user_sethandle, user_all
+from channels import channel_create, channel_invite, channel_join
+from channels import channel_details, channel_listall, channel_list
+from channels import channel_addowner, channel_removeowner
 
 def defaultHandler(err):
     response = err.get_response()
@@ -210,7 +213,7 @@ def user_profile_sethandle():
 
     return {}
 
-''' =================== CHANGE USER HANDLE =================== '''
+''' =================== VIEW ALL USERS =================== '''
 @APP.route("/users/all", methods=['GET'])
 def users_all():
     payload = request.get_json()
@@ -232,6 +235,160 @@ def users_all():
         "users": user_all_return
         }
     )
+
+''' =================== CREATE CHANNEL =================== '''
+@APP.route("/channels/create", methods=['POST'])
+def channels_create():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'name' in payload:
+        raise InputError(description='No name passed')
+    if not 'is_public' in payload:
+        raise InputError(description='No is_public passed')
+
+    token = payload['token']
+    name = payload['name']
+    is_public = payload['is_public']
+
+    channels_create_return = channel_create(token, name, is_public)
+
+    if channels_create_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channels_create_return == 'invalid channel name_length':
+        raise InputError(description='Channel name cannot be more than 20 characters')
+
+    return dumps(channels_create_return)
+
+''' =================== INVITE TO CHANNEL =================== '''
+@APP.route("/channel/invite", methods=['POST'])
+def channels_invite():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    u_id = payload['u_id']
+
+    channel_invite_return = channel_invite(token, channel_id, u_id)
+
+    if channel_invite_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_invite_return == "invalid channel_id":
+        raise InputError(description="Channel_id does not match authorised user's request")
+    if channel_invite_return == "invalid u_id":
+        raise InputError(description="Invited user does not exist")
+    if channel_invite_return == "already member":
+        raise InputError(description="Invited user is already a member")
+    if channel_invite_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")
+    
+
+    return {}
+
+''' =================== JOIN A CHANNEL =================== '''
+@APP.route("/channel/join", methods=['POST'])
+def channels_join():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+
+    channel_join_return = channel_join(token, channel_id)
+
+    if channel_join_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_join_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_join_return == "not public":
+        raise AccessError(description='Trying to join private channel without authorisation')
+    
+
+    return {}
+
+''' =================== SHOW CHANNEL DETAILS =================== '''
+@APP.route("/channel/details", methods=['GET'])
+def channels_details():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+
+    channel_details_return = channel_details(token, channel_id)
+
+    if channel_details_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_details_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_details_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")
+    
+
+    return dumps(channel_details_return)
+
+''' =================== SHOW ALL CHANNELS =================== '''
+@APP.route("/channels/listall", methods=['GET'])
+def channels_listall():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+
+    token = payload['token']
+
+    channel_listall_return = channel_listall(token)
+
+    if channel_listall_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+
+    return dumps(channel_listall_return)
+
+''' =================== SHOW CHANNELS USER IS IN =================== '''
+@APP.route("/channels/list", methods=['GET'])
+def channels_list():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+
+    token = payload['token']
+
+    channel_list_return = channel_list(token)
+
+    if channel_list_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+
+    return dumps(channel_list_return)
+
 
 if __name__ == "__main__":
     APP.run(port=(int(sys.argv[1]) if len(sys.argv) == 2 else 8080), debug=True)

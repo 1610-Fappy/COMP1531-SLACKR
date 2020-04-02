@@ -13,7 +13,8 @@ CHANNEL = {
     'channel_name' : None,
     'channel_id' : None,
     'owner_members' : [],
-    'all_members' : []
+    'all_members' : [],
+    'is_public' : None
 }
 
 DATA = {
