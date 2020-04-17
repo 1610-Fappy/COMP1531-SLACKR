@@ -57,7 +57,7 @@ def user_sethandle(token, handle_str):
 
     if valid_handle and check_unused_handle and check_token:
         index = get_user(user_id)
-        data['users'][index]['username'] = handle_str
+        data['users'][index]['handle_str'] = handle_str
         return
     if not valid_handle:
         return "invalid username"
@@ -94,7 +94,7 @@ def unused_handle(handle_str):
     ''' Checks that handle is not already used'''
     data = get_data()
     for user in data['users']:
-        if user['username'] == handle_str:
+        if user['handle_str'] == handle_str:
             return False
 
     return True

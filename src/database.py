@@ -2,7 +2,7 @@
 
 USER = {
     'email' : None,
-    'username' : None,
+    'handle_str' : None,
     'u_id' : None,
     'password' : None,
     'first_name' : None,
@@ -21,6 +21,12 @@ DATA = {
     'users' : [],
     'active_tokens' : [],
     'channels' : []
+}
+
+MEMBER_DICT = { 
+    'u_id': None, 
+    'name_first': None, 
+    'name_last': None
 }
 
 def get_data():

@@ -82,7 +82,7 @@ def check_username(username):
     ''' Checks username is not already in use'''
     data = get_data()
     for handle in data['users']:
-        if username == handle['username']:
+        if username == handle['handle_str']:
             return False
 
     return True
@@ -127,3 +127,13 @@ def correct_pass(email, password):
         'correct?' : False
     }
 
+def get_member_dict(channel_id, u_id):
+    ''' Find dictionary of member matching u_id'''
+    data = get_data()
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            for members in channel['owner_members']:
+                if members['u_id'] == u_id:
+                    return members
+
+    return

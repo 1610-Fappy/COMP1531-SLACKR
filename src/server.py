@@ -119,17 +119,13 @@ def logout():
 @APP.route("/user/profile", methods=['GET'])
 def usr_prfile():
     
-    payload = request.get_json()
-
-    if not payload:
-        raise InputError(description='No args passed')
-    if not 'token' in payload:
+    if not request.args.get('token'):
         raise InputError(description='No token passed')
-    if not 'u_id' in payload:
+    if not request.args.get('u_id'):
         raise InputError(description='No u_id passed')
 
-    token = payload['token']
-    u_id = payload['u_id']
+    token = request.args.get('token')
+    u_id = request.args.get('u_id')
 
     user_profile_return = user_profile(token, u_id)
 
@@ -138,7 +134,11 @@ def usr_prfile():
     if user_profile_return == "invalid token":
         raise InputError(description='Invalid token key')
 
-    return dumps(user_profile_return)
+    print(user_profile_return)
+
+    return dumps({
+        'user': user_profile_return
+    })
 
 ''' =================== CHANGE USER FIRST AND LAST NAME =================== '''
 @APP.route("/user/profile/setname", methods=['PUT'])
@@ -224,14 +224,11 @@ def user_profile_sethandle():
 ''' =================== VIEW ALL USERS =================== '''
 @APP.route("/users/all", methods=['GET'])
 def users_all():
-    payload = request.get_json()
-
-    if not payload:
-        raise InputError(description='No args passed')
-    if not 'token' in payload:
+  
+    if not request.args.get('token'):
         raise InputError(description='No token passed')
 
-    token = payload['token']
+    token = request.args.get('token')
 
     user_all_return = user_all(token)
 
@@ -335,17 +332,14 @@ def channels_join():
 ''' =================== SHOW CHANNEL DETAILS =================== '''
 @APP.route("/channel/details", methods=['GET'])
 def channels_details():
-    payload = request.get_json()
 
-    if not payload:
-        raise InputError(description='No args passed')
-    if not 'token' in payload:
+    if not request.args.get('token'):
         raise InputError(description='No token passed')
-    if not 'channel_id' in payload:
+    if not request.args.get('channel_id'):
         raise InputError(description='No channel_id passed')
 
-    token = payload['token']
-    channel_id = payload['channel_id']
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
 
     channel_details_return = channel_details(token, channel_id)
 
@@ -362,14 +356,11 @@ def channels_details():
 ''' =================== SHOW ALL CHANNELS =================== '''
 @APP.route("/channels/listall", methods=['GET'])
 def channels_listall():
-    payload = request.get_json()
 
-    if not payload:
-        raise InputError(description='No args passed')
-    if not 'token' in payload:
+    if not request.args.get('token'):
         raise InputError(description='No token passed')
 
-    token = payload['token']
+    token = request.args.get('token')
 
     channel_listall_return = channel_listall(token)
 
@@ -381,14 +372,11 @@ def channels_listall():
 ''' =================== SHOW CHANNELS USER IS IN =================== '''
 @APP.route("/channels/list", methods=['GET'])
 def channels_list():
-    payload = request.get_json()
 
-    if not payload:
-        raise InputError(description='No args passed')
-    if not 'token' in payload:
+    if not request.args.get('token'):
         raise InputError(description='No token passed')
 
-    token = payload['token']
+    token = request.args.get('token')
 
     channel_list_return = channel_list(token)
 
@@ -468,4 +456,5 @@ def channels_leave():
 if __name__ == "__main__":
     APP.run(port=(int(sys.argv[1]) if len(sys.argv) == 2 else 8080), debug=True)
 
-
+# FIX
+# - changing request?

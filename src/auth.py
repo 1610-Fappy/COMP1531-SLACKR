@@ -81,11 +81,11 @@ def get_user_dict(email, password, name_first, name_last):
     ''' Stores user details into dictionary'''
     user = {
         'email' : email,
-        'username' : generate_username(name_first, name_last),
+        'handle_str' : generate_username(name_first, name_last),
         'u_id' : generate_u_id(),
         'password' : hash_pass(password),
-        'first_name' : name_first,
-        'last_name' : name_last,
+        'name_first' : name_first,
+        'name_last' : name_last,
         'channels': []
     }
     return user
