@@ -26,7 +26,7 @@ def message_send(token, channel_id, message):
     message_dict['channel_id'] = channel_id
     for channel in data['channels']:
         if channel_id == channel['channel_id']:
-            channel['messages'].append(message_id)
+            channel['messages'].append(message_dict)
             data['messages'].append(message_dict)
     return message_id
 
