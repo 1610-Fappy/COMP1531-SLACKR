@@ -127,7 +127,9 @@ def message_unreact(token, message_id, react_id):
                             if not react['u_ids']:
                                 message_dict['reacts'].remove(react)
                             return
-                    return "not reacted to"
+                    # if another user clicks it, add u_id to react_dict
+                    react['u_ids'].append(u_id)
+                    react['is_this_user_reacted'] = True
 
     return "not a member"
 
@@ -261,17 +263,25 @@ def channel_messages(token, channel_id, start):
 
     list_of_messages = channel_dict['messages']
 
+    list_of_messages_copy = list_of_messages[:]
+    if len(list_of_messages_copy) > 1:
+        list_of_messages_copy.reverse()
+
     end = start + 50
+
     if start > len(list_of_messages):
-        return "start is greater than total messages"
+        return {
+        'messages': list_of_messages_copy[start : end],
+        'start': start,
+        'end': -1
+    }
 
     return {
-        'messages': list_of_messages,
+        'messages': list_of_messages_copy[start : end],
         'start': start,
         'end': end
     }
 
-    
 
 def generate_messageid():
     ''' Generates a unique message id'''

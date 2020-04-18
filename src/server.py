@@ -630,8 +630,6 @@ def msg_unreact():
         raise InputError(description="Invalid Message ID")
     if message_unreact_return == "invalid react_id":
         raise InputError(description="Invalid React ID")
-    if message_unreact_return == "not reacted to":
-        raise InputError(description="No reaction from authorised user")
     if message_unreact_return == "not a member":
         raise AccessError(description="Not a member of channel")
 
@@ -790,8 +788,6 @@ def load_messages():
         raise InputError(description='Invalid token key')
     if channel_messages_return == "invalid channel_id":
         raise InputError(description="Invalid Channel ID")
-    if channel_messages_return == "start is greater than total messages":
-        raise InputError(description="No more messages")
     if channel_messages_return == "not member":
         raise AccessError(description="Authorised user is not a member of this channel")
     
