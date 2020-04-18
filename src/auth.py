@@ -92,7 +92,7 @@ def get_user_dict(email, password, name_first, name_last):
 
 def generate_u_id():
     ''' Generates unique user id'''
-    return str(uuid.uuid4())
+    return uuid.uuid4().int>>112
 
 def valid_password(password):
     ''' Checks that the password is valid'''

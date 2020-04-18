@@ -95,6 +95,7 @@ def message_react(token, message_id, react_id):
                             if reacted == u_id:
                                 return "already reacted to"
                         react['u_ids'].append(u_id)
+                        react['is_this_user_reacted'] = True
                         return
 
     return "not a member"
@@ -122,6 +123,7 @@ def message_unreact(token, message_id, react_id):
                     for reacted in react['u_ids']:
                         if reacted == u_id:
                             react['u_ids'].remove(u_id)
+                            react['is_this_user_reacted'] = False
                             if not react['u_ids']:
                                 message_dict['reacts'].remove(react)
                             return
@@ -273,7 +275,7 @@ def channel_messages(token, channel_id, start):
 
 def generate_messageid():
     ''' Generates a unique message id'''
-    return str(uuid.uuid4())
+    return uuid.uuid4().int>>112
 
 def valid_message_id(message_id):
     ''' Checks that a message id is valid'''

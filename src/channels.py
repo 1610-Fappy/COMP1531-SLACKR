@@ -213,7 +213,7 @@ def get_channel_dict(name, is_public):
     ''' Stores channels details into dictionary'''
     channel = {
         'channel_name' : name,
-        'channel_id' : generate_channelid(name),
+        'channel_id' : generate_channelid(),
         'owner_members' : [],
         'all_members' : [],
         'is_public' : is_public,

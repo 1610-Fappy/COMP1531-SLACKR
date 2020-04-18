@@ -130,7 +130,7 @@ def usr_prfile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
 
-    print(type(u_id))
+    u_id = int(u_id)
 
     user_profile_return = user_profile(token, u_id)
 
@@ -289,7 +289,8 @@ def channels_invite():
     channel_id = payload['channel_id']
     u_id = payload['u_id']
 
-    print(type(u_id))
+    u_id = int(u_id)
+    channel_id = int(channel_id)
 
     channel_invite_return = channel_invite(token, channel_id, u_id)
 
@@ -321,6 +322,7 @@ def channels_join():
 
     token = payload['token']
     channel_id = payload['channel_id']
+    channel_id = int(channel_id)
 
     channel_join_return = channel_join(token, channel_id)
 
@@ -345,6 +347,8 @@ def channels_details():
 
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
+
+    channel_id = int(channel_id)
 
     channel_details_return = channel_details(token, channel_id)
 
@@ -407,6 +411,9 @@ def channels_addowner():
     channel_id = payload['channel_id']
     u_id = payload['u_id']
 
+    u_id = int(u_id)
+    channel_id = int(channel_id)
+
     channel_addowner_return = channel_addowner(token, channel_id, u_id)
 
     if channel_addowner_return == "invalid token":
@@ -438,6 +445,9 @@ def channels_removeowner():
     channel_id = payload['channel_id']
     u_id = payload['u_id']
 
+    u_id = int(u_id)
+    channel_id = int(channel_id)
+
     channel_removeowner_return = channel_removeowner(token, channel_id, u_id)
 
     if channel_removeowner_return == "invalid token":
@@ -465,6 +475,8 @@ def leave_channel():
 
     token = payload['token']
     channel_id = payload['channel_id']
+
+    channel_id = int(channel_id)
 
     channel_leave_return = channel_leave(token, channel_id)
 
@@ -495,6 +507,8 @@ def msg_send():
     token = payload['token']
     channel_id = payload['channel_id']
     message = payload['message']
+
+    channel_id = int(channel_id)
 
     message_send_return = message_send(token, channel_id, message)
 
@@ -532,6 +546,8 @@ def msg_sendlater():
     message = payload['message']
     time_sent = payload['time_sent']
 
+    channel_id = int(channel_id)
+
     message_sendlater_return = message_sendlater(token, channel_id, message, time_sent)
 
     if message_sendlater_return == "invalid token":
@@ -567,6 +583,9 @@ def msg_react():
     message_id = payload['message_id']
     react_id = payload['react_id']
 
+    message_id = int(message_id)
+    react_id = int(react_id)
+
     message_react_return = message_react(token, message_id, react_id)
 
     if message_react_return == "invalid token":
@@ -600,6 +619,9 @@ def msg_unreact():
     message_id = payload['message_id']
     react_id = payload['react_id']
 
+    message_id = int(message_id)
+    react_id = int(react_id)
+
     message_unreact_return = message_unreact(token, message_id, react_id)
 
     if message_unreact_return == "invalid token":
@@ -609,7 +631,7 @@ def msg_unreact():
     if message_unreact_return == "invalid react_id":
         raise InputError(description="Invalid React ID")
     if message_unreact_return == "not reacted to":
-        raise InputError(description="No reaction")
+        raise InputError(description="No reaction from authorised user")
     if message_unreact_return == "not a member":
         raise AccessError(description="Not a member of channel")
 
@@ -629,6 +651,8 @@ def msg_pin():
 
     token = payload['token']
     message_id = payload['message_id']
+
+    message_id = int(message_id)
 
     message_pin_return = message_pin(token, message_id)
 
@@ -660,6 +684,8 @@ def msg_unpin():
     token = payload['token']
     message_id = payload['message_id']
 
+    message_id = int(message_id)
+
     message_unpin_return = message_unpin(token, message_id)
 
     if message_unpin_return == "invalid token":
@@ -689,6 +715,8 @@ def msg_remove():
 
     token = payload['token']
     message_id = payload['message_id']
+
+    message_id = int(message_id)
 
     message_remove_return = message_remove(token, message_id)
 
@@ -721,6 +749,8 @@ def msg_edit():
     message_id = payload['message_id']
     message = payload['message']
 
+    message_id = int(message_id)
+
     message_edit_return = message_edit(token, message_id, message)
 
     if message_edit_return == "invalid token":
@@ -750,7 +780,9 @@ def load_messages():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
     start = request.args.get('start')
+
     start = int(start)
+    channel_id = int(channel_id)
 
     channel_messages_return = channel_messages(token, channel_id, start)
 
