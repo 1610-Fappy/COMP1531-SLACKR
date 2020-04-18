@@ -15,7 +15,9 @@ CHANNEL = {
     'owner_members' : [],
     'all_members' : [],
     'is_public' : None,
-    'message_id' : None
+    'message_id' : None,
+    'standup_finish' : '',
+    'standup_messages' : []
 }
 
 DATA = {
