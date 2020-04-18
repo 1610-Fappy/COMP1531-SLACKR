@@ -8,7 +8,7 @@ from user import user_profile, user_setname, user_setemail, user_sethandle, user
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner, channel_leave
-from workplace import change_permission, remove_user
+from workplace import change_permission, remove_user, reset_workplace
 
 def defaultHandler(err):
     response = err.get_response()
@@ -529,6 +529,12 @@ def remove_users():
     if remove_user_return == "invalid u_id":
         raise AccessError(description="User ID is invalid")
 
+    return {}
+
+''' =================== Clears Workplace =================== '''
+@APP.route("/workspace/reset", methods=['POST'])
+def refresh():
+    reset_workplace()
     return {}
 
 if __name__ == "__main__":
