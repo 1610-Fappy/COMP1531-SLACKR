@@ -105,6 +105,7 @@ def channel_leave(token, channel_id):
         for member in channel['owner_members']:
             if user_id == member['u_id']:
                 channel['owner_members'].remove(member)
+
     else:
         return "not member"
 

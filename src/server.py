@@ -331,7 +331,7 @@ def channels_join():
 
 ''' =================== LEAVE A CHANNEL ======================== '''
 @APP.route("/channel/leave", methods=['POST'])
-def channels_leave():
+def leave_channel():
     payload = request.get_json()
 
     if not payload:
