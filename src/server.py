@@ -8,6 +8,8 @@ from user import user_profile, user_setname, user_setemail, user_sethandle, user
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner
+from messages import message_send, message_sendlater, message_react, message_unreact
+from messages import message_pin, message_unpin, message_remove, message_edit
 
 def defaultHandler(err):
     response = err.get_response()
@@ -127,14 +129,14 @@ def usr_prfile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
 
+    print(type(u_id))
+
     user_profile_return = user_profile(token, u_id)
 
     if user_profile_return == "invalid u_id":
         raise InputError(description='USER ID not found in records')
     if user_profile_return == "invalid token":
         raise InputError(description='Invalid token key')
-
-    print(user_profile_return)
 
     return dumps({
         'user': user_profile_return
@@ -235,7 +237,7 @@ def users_all():
     if user_all_return == "invalid token":
         raise InputError(description="Invalid token key")
 
-    return (
+    return dumps(
         {
         "users": user_all_return
         }
@@ -285,6 +287,8 @@ def channels_invite():
     token = payload['token']
     channel_id = payload['channel_id']
     u_id = payload['u_id']
+
+    print(type(u_id))
 
     channel_invite_return = channel_invite(token, channel_id, u_id)
 
@@ -349,7 +353,6 @@ def channels_details():
         raise InputError(description="Invalid Channel ID")
     if channel_details_return == "not member":
         raise AccessError(description="Authorised user is not part of the channel")
-    
 
     return dumps(channel_details_return)
 
@@ -451,6 +454,143 @@ def channels_removeowner():
 @APP.route("/channel/leave", methods=['POST'])
 def channels_leave():
     pass
+
+''' =================== SEND A MESSAGE IN A CHANNEL  =================== '''
+@APP.route("/message/send", methods=['POST'])
+def msg_send():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    message = payload['message']
+
+    message_send_return = message_send(token, channel_id, message)
+
+    if message_send_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_send_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if message_send_return == "more than 1000 characters":
+        raise InputError(description="Message must be less than 1000 characters")
+    if message_send_return == "not member":
+        raise AccessError(description="User is not a member of this channel")
+
+    return dumps({
+        'message_id': message_send_return
+    })
+
+''' ================ SEND A MESSAGE LATER IN A CHANNEL  ================ '''
+@APP.route("/message/sendlater", methods=['POST'])
+def msg_sendlater():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+    if not 'time_sent' in payload:
+        raise InputError(description='No time_sent passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    message = payload['message']
+    time_sent = payload['time_sent']
+
+    message_sendlater_return = message_sendlater(token, channel_id, message, time_sent)
+
+    if message_sendlater_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_sendlater_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if message_sendlater_return == "more than 1000 characters":
+        raise InputError(description="Message must be less than 1000 characters")
+    if message_sendlater_return == "time passed":
+        raise InputError(description="Cannot send messages in the past")
+    if message_sendlater_return == "not member":
+        raise AccessError(description="User is not a member of this channel")
+
+    return dumps({
+        'message_id': message_sendlater_return
+    })
+
+''' ================ REACT TO A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/react", methods=['POST'])
+def msg_react():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+    if not 'react_id' in payload:
+        raise InputError(description='No react_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+    react_id = payload['react_id']
+
+    message_react_return = message_react(token, message_id, react_id)
+
+    if message_react_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_react_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_react_return == "invalid react_id":
+        raise InputError(description="Invalid React ID")
+    if message_react_return == "already reacted to":
+        raise InputError(description="Already reacted")
+    if message_react_return == "not a member":
+        raise InputError(description="Not a member of channel")
+
+    return dumps({})
+
+''' ================ REACT TO A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/unreact", methods=['POST'])
+def msg_unreact():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+    if not 'react_id' in payload:
+        raise InputError(description='No react_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+    react_id = payload['react_id']
+
+    message_unreact_return = message_unreact(token, message_id, react_id)
+
+    if message_unreact_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_unreact_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_unreact_return == "invalid react_id":
+        raise InputError(description="Invalid React ID")
+    if message_unreact_return == "not reacted to":
+        raise InputError(description="No reaction")
+    if message_unreact_return == "not a member":
+        raise InputError(description="Not a member of channel")
+
+    return dumps({})
 
 
 if __name__ == "__main__":
