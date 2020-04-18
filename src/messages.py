@@ -139,7 +139,7 @@ def message_pin(token, message_id):
         return "invalid message_id"
 
     message_dict = find_message(message_id)
-    if message_dict['is_pinnsed']:
+    if message_dict['is_pinned']:
         return "already pinned"
 
     u_id = decode_token(token)
@@ -153,7 +153,7 @@ def message_pin(token, message_id):
     if not is_owner:
         return "not owner"
 
-    message_dict['is_pinned'] == True
+    message_dict['is_pinned'] = True
 
     return
 
@@ -167,7 +167,7 @@ def message_unpin(token, message_id):
         return "invalid message_id"
 
     message_dict = find_message(message_id)
-    if not message_dict['is_pinnsed']:
+    if not message_dict['is_pinned']:
         return "already unpinned"
 
     u_id = decode_token(token)
@@ -181,7 +181,7 @@ def message_unpin(token, message_id):
     if not is_owner:
         return "not owner"
 
-    message_dict['is_pinned'] == False
+    message_dict['is_pinned'] = False
 
     return
 
@@ -213,10 +213,9 @@ def message_remove(token, message_id):
 
 def message_edit(token, message_id, message):
     ''' Function for user to edit a message '''
-    data = get_data()
 
     if len(message) > 1000:
-        return "More than 1000 characters"
+        return "more than 1000 characters"
 
     if not valid_token(token):
         return "invalid token"

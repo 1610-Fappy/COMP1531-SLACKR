@@ -592,9 +592,128 @@ def msg_unreact():
 
     return dumps({})
 
+''' ================ PIN A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/pin", methods=['POST'])
+def msg_pin():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+
+    message_pin_return = message_pin(token, message_id)
+
+    if message_pin_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_pin_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_pin_return == "already pinned":
+        raise InputError(description="Message already pinned")
+    if message_pin_return == "not member":
+        raise InputError(description="Authorised user is not a member of this channel")
+    if message_pin_return == "not owner":
+        raise InputError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ UNPIN A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/unpin", methods=['POST'])
+def msg_unpin():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+
+    message_unpin_return = message_unpin(token, message_id)
+
+    if message_unpin_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_unpin_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_unpin_return == "already unpinned":
+        raise InputError(description="Message already unpinned")
+    if message_unpin_return == "not member":
+        raise InputError(description="Authorised user is not a member of this channel")
+    if message_unpin_return == "not owner":
+        raise InputError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ REMOVE A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/remove", methods=['DELETE'])
+def msg_remove():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+
+    message_remove_return = message_remove(token, message_id)
+
+    if message_remove_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_remove_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_remove_return == "not member":
+        raise InputError(description="Authorised user is not a member of this channel")
+    if message_remove_return == "not owner":
+        raise InputError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ EDIT A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/edit", methods=['PUT'])
+def msg_edit():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+    message = payload['message']
+
+    message_edit_return = message_edit(token, message_id, message)
+
+    if message_edit_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_edit_return == "more than 1000 characters":
+        raise InputError(description="Message must be less than 1000 characters")
+    if message_edit_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_edit_return == "not member":
+        raise InputError(description="Authorised user is not a member of this channel")
+    if message_edit_return == "not owner":
+        raise InputError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+
 
 if __name__ == "__main__":
     APP.run(port=(int(sys.argv[1]) if len(sys.argv) == 2 else 8080), debug=True)
-
-# FIX
-# - changing request?
