@@ -594,8 +594,8 @@ def msg_react():
         raise InputError(description="Invalid Message ID")
     if message_react_return == "invalid react_id":
         raise InputError(description="Invalid React ID")
-    if message_react_return == "already reacted to":
-        raise InputError(description="Already reacted")
+    # if message_react_return == "already reacted to":
+    #     raise InputError(description="Already reacted")
     if message_react_return == "not a member":
         raise AccessError(description="Not a member of channel")
 
