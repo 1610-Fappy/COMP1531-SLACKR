@@ -14,15 +14,16 @@ def change_permission(token, u_id, permission_id):
     data = get_data()
     if not valid_token(token):
         return "invalid token"
-    if permission_id != 1 or permission_id != 2:
+    if permission_id in [1, 2]:
+        token_u_id = decode_token(token)
+        token_user_index = get_user(token_u_id)
+        new_user_index = get_user(u_id)
+        if data['users'][token_user_index]['permissions'] != 1:
+            return "invalid permissions"
+        if new_user_index == -1:
+            return "invalid u_id"
+    else:
         return "invalid permission_id"
-    token_u_id = decode_token(token)
-    token_user_index = get_user(token_u_id)
-    new_user_index = get_user(u_id)
-    if data['users'][token_user_index]['permissions'] != 1:
-        return "invalid permissions"
-    if new_user_index == -1:
-        return "invalid u_id"
 
     data['users'][new_user_index]['permissions'] = permission_id
 
