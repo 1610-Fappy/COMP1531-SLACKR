@@ -8,7 +8,8 @@ USER = {
     'first_name' : None,
     'last_name' : None,
     'channels' : None,
-    'token' : None
+    'token' : None,
+    'permissions' : None
 }
 
 CHANNEL = {

@@ -35,6 +35,8 @@ def auth_register(email, password, name_first, name_last):
     if check_email and check_psswrd and check_names:
         user = get_user_dict(email, password, name_first, name_last)
         token = generate_token(user['u_id'])
+        if not data['users']:
+            user['permissions'] = 1
         data['users'].append(user)
         data['active_tokens'].append(token)
         return {
@@ -77,7 +79,8 @@ def get_user_dict(email, password, name_first, name_last):
         'password' : hash_pass(password),
         'first_name' : name_first,
         'last_name' : name_last,
-        'channels' : []
+        'channels' : [],
+        'permissions' : 2
     }
     return user
 
