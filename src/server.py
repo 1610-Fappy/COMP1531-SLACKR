@@ -10,6 +10,7 @@ from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner, channel_leave
 from messages import message_send, message_sendlater, message_react, message_unreact
 from messages import message_pin, message_unpin, message_remove, message_edit
+from messages import channel_messages
 
 def defaultHandler(err):
     response = err.get_response()
@@ -577,7 +578,7 @@ def msg_react():
     if message_react_return == "already reacted to":
         raise InputError(description="Already reacted")
     if message_react_return == "not a member":
-        raise InputError(description="Not a member of channel")
+        raise AccessError(description="Not a member of channel")
 
     return dumps({})
 
@@ -610,7 +611,7 @@ def msg_unreact():
     if message_unreact_return == "not reacted to":
         raise InputError(description="No reaction")
     if message_unreact_return == "not a member":
-        raise InputError(description="Not a member of channel")
+        raise AccessError(description="Not a member of channel")
 
     return dumps({})
 
@@ -638,9 +639,9 @@ def msg_pin():
     if message_pin_return == "already pinned":
         raise InputError(description="Message already pinned")
     if message_pin_return == "not member":
-        raise InputError(description="Authorised user is not a member of this channel")
+        raise AccessError(description="Authorised user is not a member of this channel")
     if message_pin_return == "not owner":
-        raise InputError(description="Authorised user is not an owner of this channel")
+        raise AccessError(description="Authorised user is not an owner of this channel")
 
     return dumps({})
 
@@ -668,9 +669,9 @@ def msg_unpin():
     if message_unpin_return == "already unpinned":
         raise InputError(description="Message already unpinned")
     if message_unpin_return == "not member":
-        raise InputError(description="Authorised user is not a member of this channel")
+        raise AccessError(description="Authorised user is not a member of this channel")
     if message_unpin_return == "not owner":
-        raise InputError(description="Authorised user is not an owner of this channel")
+        raise AccessError(description="Authorised user is not an owner of this channel")
 
     return dumps({})
 
@@ -696,9 +697,9 @@ def msg_remove():
     if message_remove_return == "invalid message_id":
         raise InputError(description="Invalid Message ID")
     if message_remove_return == "not member":
-        raise InputError(description="Authorised user is not a member of this channel")
+        raise AccessError(description="Authorised user is not a member of this channel")
     if message_remove_return == "not owner":
-        raise InputError(description="Authorised user is not an owner of this channel")
+        raise AccessError(description="Authorised user is not an owner of this channel")
 
     return dumps({})
 
@@ -729,12 +730,40 @@ def msg_edit():
     if message_edit_return == "invalid message_id":
         raise InputError(description="Invalid Message ID")
     if message_edit_return == "not member":
-        raise InputError(description="Authorised user is not a member of this channel")
+        raise AccessError(description="Authorised user is not a member of this channel")
     if message_edit_return == "not owner":
-        raise InputError(description="Authorised user is not an owner of this channel")
+        raise AccessError(description="Authorised user is not an owner of this channel")
 
     return dumps({})
 
+''' ================ LOAD MESSAGEs IN A CHANNEL  ================ '''
+@APP.route("/channel/messages", methods=['GET'])
+def load_messages():
+    
+    if not request.args.get('token'):
+        raise InputError(description='No token passed')
+    if not request.args.get('channel_id'):
+        raise InputError(description='No channel_id passed')
+    if not request.args.get('start'):
+        raise InputError(description='No start passed')
+
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+    start = int(start)
+
+    channel_messages_return = channel_messages(token, channel_id, start)
+
+    if channel_messages_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_messages_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_messages_return == "start is greater than total messages":
+        raise InputError(description="No more messages")
+    if channel_messages_return == "not member":
+        raise AccessError(description="Authorised user is not a member of this channel")
+    
+    return dumps(channel_messages_return)
 
 
 if __name__ == "__main__":

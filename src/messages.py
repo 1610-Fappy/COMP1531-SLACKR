@@ -240,6 +240,36 @@ def message_edit(token, message_id, message):
 
     return
     
+def channel_messages(token, channel_id, start):
+
+    if not valid_token(token):
+        return "invalid token"
+    if not valid_channelid(channel_id):
+        return "invalid channel_id"
+    
+    u_id = decode_token(token)
+
+    channel_dict = find_channel_dict(channel_id)
+    for user in channel_dict['all_members']:
+        if user['u_id'] == u_id:
+            user_in_channel = True
+    
+    if not user_in_channel:
+        return "not member"
+
+    list_of_messages = channel_dict['messages']
+
+    end = start + 50
+    if start > len(list_of_messages):
+        return "start is greater than total messages"
+
+    return {
+        'messages': list_of_messages,
+        'start': start,
+        'end': end
+    }
+
+    
 
 def generate_messageid():
     ''' Generates a unique message id'''
@@ -320,3 +350,13 @@ def check_owner(channel_dict, u_id):
             return True
 
     return False
+
+def find_channel_dict(channel_id):
+    ''' Given channel_id find corresponding channel dictionary'''
+    data = get_data()
+
+    for channel in data['channels']:
+        if channel['channel_id'] == channel_id:
+            return channel
+
+    return None

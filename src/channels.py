@@ -208,6 +208,7 @@ def channel_leave(token, channel_id):
     else:
         return "not member"
 
+
 def get_channel_dict(name, is_public):
     ''' Stores channels details into dictionary'''
     channel = {
