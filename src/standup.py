@@ -10,16 +10,16 @@ def standup_start(token, channel_id, length):
         return "invalid token"
     if not valid_channelid(channel_id):
         return "invalid channel_id"
-    if not valid_channelid(channel_id):
-        return "invalid channel_id"
     channel_index = get_channel(channel_id)
 
     if not data['channels'][channel_index]['standup_finish']:
         data['channels'][channel_index]['standup_finish'] = time_finish
     elif datetime.now() > data['channels']['standup_finish']:
         data['channels'][channel_index]['standup_finish'] = time_finish
+    else:
+        return "standup already active"
     
-    return time_finish
+    return {'time_finish' : time_finish}
 
 def standup_active(token, channel_id):
     data = get_data()

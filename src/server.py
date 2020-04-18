@@ -9,6 +9,7 @@ from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner, channel_leave
 from workplace import change_permission, remove_user, reset_workplace
+from standup import standup_start, standup_active, standup_send
 
 def defaultHandler(err):
     response = err.get_response()
@@ -473,6 +474,92 @@ def channels_removeowner():
         raise AccessError(description="User is not an owner")
 
     return {}
+
+
+''' =================== Starts a Standup  =================== '''
+@APP.route("/standup/start", methods=['POST'])
+def start_standup():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'length' in payload:
+        raise InputError(description='No length of time passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+    length = int(payload['length'])
+
+    standup_start_return = standup_start(token, channel_id, length)
+
+    if standup_start_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_start_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if standup_start_return == "standup already active":
+        raise AccessError(description="Standup is already in Progress")
+
+    return dumps(standup_start_return)
+
+''' =================== Checks if Standup is Active =================== '''
+@APP.route("/standup/active", methods=['GET'])
+def active_standup():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+
+    standup_active_return = standup_active(token, channel_id)
+
+    if standup_active_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_active_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+
+    return dumps(standup_active_return)
+
+''' =================== Sends message to Standup =================== '''
+@APP.route("/standup/active", methods=['POST'])
+def active_standup():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+    message = payload['message']
+
+    standup_send_return = standup_send(token, channel_id, message)
+
+    if standup_send_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_send_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if standup_send_return == "More than 1000 characters":
+        raise InputError(description="Message is too long")
+    if standup_send_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")
+
+    return {}
+
 
 ''' =================== Change permissions for user  =================== '''
 @APP.route("/admin/userpermission/change", methods=['POST'])
