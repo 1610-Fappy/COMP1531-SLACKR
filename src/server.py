@@ -8,7 +8,7 @@ from user import user_profile, user_setname, user_setemail, user_sethandle, user
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner, channel_leave
-from workplace import change_permission
+from workplace import change_permission, remove_user
 
 def defaultHandler(err):
     response = err.get_response()
@@ -489,7 +489,7 @@ def change_permissions():
         raise InputError(description='No permission_id passed')
 
     token = payload['token']
-    u_id = payload['u_id']
+    u_id = int(payload['u_id'])
     permission_id = int(payload['permission_id'])
 
     change_permission_return = change_permission(token, u_id, permission_id)
@@ -505,7 +505,31 @@ def change_permissions():
 
     return {}
 
+''' =================== Remove user from slackr =================== '''
+@APP.route("/admin/user/remove", methods=['DELETE'])
+def remove_users():
+    payload = request.get_json()
 
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+
+    token = payload['token']
+    u_id = int(payload['u_id'])
+
+    remove_user_return = remove_user(token, u_id)
+
+    if remove_user_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if remove_user_return == "invalid permissions":
+        raise AccessError(description="User is not Authorised")
+    if remove_user_return == "invalid u_id":
+        raise AccessError(description="User ID is invalid")
+
+    return {}
 
 if __name__ == "__main__":
     APP.run(port=(int(sys.argv[1]) if len(sys.argv) == 2 else 8080), debug=True)
