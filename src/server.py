@@ -8,6 +8,7 @@ from user import user_profile, user_setname, user_setemail, user_sethandle, user
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner, channel_leave
+from workplace import change_permission
 
 def defaultHandler(err):
     response = err.get_response()
@@ -473,10 +474,37 @@ def channels_removeowner():
 
     return {}
 
-''' =================== REMOVE OWNER STATUS FROM MEMBER  =================== '''
-@APP.route("/channel/leave", methods=['POST'])
-def channels_leave():
-    pass
+''' =================== Change permissions for user  =================== '''
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def change_permissions():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+    if not 'permission_id' in payload:
+        raise InputError(description='No permission_id passed')
+
+    token = payload['token']
+    u_id = payload['u_id']
+    permission_id = int(payload['permission_id'])
+
+    change_permission_return = change_permission(token, u_id, permission_id)
+
+    if change_permission_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if change_permission_return == "invalid permission_id":
+        raise InputError(description="Invalid Permission ID")
+    if change_permission_return == "invalid permissions":
+        raise AccessError(description="User is not Authorised")
+    if change_permission_return == "invalid u_id":
+        raise AccessError(description="User ID is invalid")
+
+    return {}
+
 
 
 if __name__ == "__main__":
