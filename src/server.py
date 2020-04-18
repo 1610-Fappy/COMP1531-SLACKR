@@ -7,7 +7,7 @@ from auth import auth_register, auth_login, auth_logout
 from user import user_profile, user_setname, user_setemail, user_sethandle, user_all
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
-from channels import channel_addowner, channel_removeowner
+from channels import channel_addowner, channel_removeowner, channel_leave
 from messages import message_send, message_sendlater, message_react, message_unreact
 from messages import message_pin, message_unpin, message_remove, message_edit
 
@@ -452,8 +452,30 @@ def channels_removeowner():
 
 ''' =================== REMOVE OWNER STATUS FROM MEMBER  =================== '''
 @APP.route("/channel/leave", methods=['POST'])
-def channels_leave():
-    pass
+def leave_channel():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+
+    channel_leave_return = channel_leave(token, channel_id)
+
+    if channel_leave_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_leave_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_leave_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")    
+
+    return {}
+
 
 ''' =================== SEND A MESSAGE IN A CHANNEL  =================== '''
 @APP.route("/message/send", methods=['POST'])
