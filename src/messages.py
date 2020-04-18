@@ -93,7 +93,9 @@ def message_react(token, message_id, react_id):
                     if react['react_id'] == react_id:
                         for reacted in react['u_ids']:
                             if reacted == u_id:
-                                return "already reacted to"
+                                react['u_ids'].remove(u_id)
+                                react['is_this_user_reacted'] = False
+                                # return "already reacted to"
                         react['u_ids'].append(u_id)
                         react['is_this_user_reacted'] = True
                         return

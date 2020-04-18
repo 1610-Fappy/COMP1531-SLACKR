@@ -99,7 +99,7 @@ def channel_details(token, channel_id):
         return "not member"
 
     return {
-        'name' : data['channels'][channel_index]['channel_name'],
+        'name' : data['channels'][channel_index]['name'],
         'owner_members' : data['channels'][channel_index]['owner_members'],
         'all_members' : data['channels'][channel_index]['all_members']
     }
@@ -212,7 +212,7 @@ def channel_leave(token, channel_id):
 def get_channel_dict(name, is_public):
     ''' Stores channels details into dictionary'''
     channel = {
-        'channel_name' : name,
+        'name' : name,
         'channel_id' : generate_channelid(),
         'owner_members' : [],
         'all_members' : [],
