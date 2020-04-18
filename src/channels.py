@@ -215,7 +215,9 @@ def get_channel_dict(name, is_public):
         'channel_id' : generate_channelid(name),
         'owner_members' : [],
         'all_members' : [],
-        'is_public' : is_public
+        'is_public' : is_public,
+        'standup_finish' : '',
+        'standup_messages' : []
     }
     return channel
 
