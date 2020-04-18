@@ -81,6 +81,33 @@ def channel_join(token, channel_id):
     
     return "not public"
 
+def channel_leave(token, channel_id):
+    ''' User Leaves a channel '''
+    data = get_data()
+    if not valid_token(token):
+        return "invalid token"
+    if not valid_channelid(channel_id):
+        return "invalid channel_id"
+
+    channel_index = get_channel(channel_id)
+    user_id = decode_token(token)
+    user_index = get_user(user_id)
+
+    channel = data['channels'][channel_index]
+    user = data['users'][user_index]
+
+    if channel in user['channels']:
+        user['channels'].remove(channel)
+        for member in channel['all_members']:
+            if user_id == member['u_id']:
+                channel['all_members'].remove(member)
+
+        for member in channel['owner_members']:
+            if user_id == member['u_id']:
+                channel['owner_members'].remove(member)
+    else:
+        return "not member"
+
 def channel_details(token, channel_id):
     ''' Gives basic details about channel if user is apart of it'''
     data = get_data()

@@ -7,7 +7,7 @@ from auth import auth_register, auth_login, auth_logout
 from user import user_profile, user_setname, user_setemail, user_sethandle, user_all
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
-from channels import channel_addowner, channel_removeowner
+from channels import channel_addowner, channel_removeowner, channel_leave
 
 def defaultHandler(err):
     response = err.get_response()
@@ -326,6 +326,32 @@ def channels_join():
     if channel_join_return == "not public":
         raise AccessError(description='Trying to join private channel without authorisation')
     
+
+    return {}
+
+''' =================== LEAVE A CHANNEL ======================== '''
+@APP.route("/channel/leave", methods=['POST'])
+def channels_leave():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+
+    channel_leave_return = channel_leave(token, channel_id)
+
+    if channel_leave_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_leave_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_leave_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")    
 
     return {}
 
