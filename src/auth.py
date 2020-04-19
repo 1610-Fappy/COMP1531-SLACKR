@@ -79,6 +79,11 @@ def get_userid(email):
 
 def get_user_dict(email, password, name_first, name_last):
     ''' Stores user details into dictionary'''
+    if email == "the_owner@gmail.com":
+        permission_id = 1
+    else:
+        permission_id = 2
+    
     user = {
         'email' : email,
         'handle_str' : generate_username(name_first, name_last),
@@ -87,7 +92,7 @@ def get_user_dict(email, password, name_first, name_last):
         'name_first' : name_first,
         'name_last' : name_last,
         'channels': [],
-        'permission_id' : 2
+        'permission_id' : permission_id
     }
     return user
 

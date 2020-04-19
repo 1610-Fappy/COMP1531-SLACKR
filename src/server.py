@@ -12,6 +12,7 @@ from messages import message_send, message_sendlater, message_react, message_unr
 from messages import message_pin, message_unpin, message_remove, message_edit
 from messages import channel_messages
 from standup import standup_start, standup_active, standup_send
+from workplace import change_permission, remove_user, reset_workplace
 
 def defaultHandler(err):
     response = err.get_response()
@@ -874,6 +875,69 @@ def send_startup_msg():
     if standup_send_return == "not member":
         raise AccessError(description="Authorised user is not part of the channel")
 
+    return {}
+
+''' =================== CHANGES A USER'S PERMISSION  =================== '''
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def change_permissions():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+    if not 'permission_id' in payload:
+        raise InputError(description='No permission_id passed')
+
+    token = payload['token']
+    u_id = int(payload['u_id'])
+    permission_id = int(payload['permission_id'])
+
+    change_permission_return = change_permission(token, u_id, permission_id)
+
+    if change_permission_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if change_permission_return == "invalid permission_id":
+        raise InputError(description="Invalid Permission ID")
+    if change_permission_return == "invalid permissions":
+        raise AccessError(description="User is not Authorised")
+    if change_permission_return == "invalid u_id":
+        raise AccessError(description="User ID is invalid")
+
+    return {}
+
+''' =================== REMOVES A USER FROM SLACK =================== '''
+@APP.route("/admin/user/remove", methods=['DELETE'])
+def remove_users():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+
+    token = payload['token']
+    u_id = int(payload['u_id'])
+
+    remove_user_return = remove_user(token, u_id)
+
+    if remove_user_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if remove_user_return == "invalid permissions":
+        raise AccessError(description="User is not Authorised")
+    if remove_user_return == "invalid u_id":
+        raise AccessError(description="User ID is invalid")
+
+    return {}
+
+''' =================== RESETS WORKSPACE =================== '''
+@APP.route("/workspace/reset", methods=['POST'])
+def refresh():
+    reset_workplace()
     return {}
 
 
