@@ -12,6 +12,7 @@ from channels import channel_addowner, channel_removeowner, channel_leave
 from workplace import change_permission, remove_user, reset_workplace
 from standup import standup_start, standup_active, standup_send
 from password import password_request, password_reset
+from search import query_search
 
 def defaultHandler(err):
     response = err.get_response()
@@ -669,6 +670,28 @@ def reset_password():
         raise InputError(description='The inputted code is invalid')  
 
     return {}
+
+''' =================== Searches for query string  =================== '''
+@APP.route("/auth/passwordreset/reset", methods=['GET'])
+def search_string():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No Token passed')
+    if not 'query_str' in payload:
+        raise InputError(description='No Query String passed')
+
+    token = payload['token']
+    query_str = payload['query_str']
+
+    search_return = query_search(token, query_str)
+
+    if search_return == "invalid token":
+        raise InputError(description='Invalid token key')
+
+    return dumps(search_return)
 
 ''' =================== Remove user from slackr =================== '''
 @APP.route("/admin/user/remove", methods=['DELETE'])
