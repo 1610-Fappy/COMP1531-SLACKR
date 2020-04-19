@@ -1,6 +1,6 @@
 import sys
 from json import dumps
-from flask import Flask, request, abort
+from flask import Flask, request
 from flask_cors import CORS
 from flask_mail import Mail, Message
 from error import InputError, AccessError
@@ -15,6 +15,7 @@ from messages import channel_messages
 from standup import standup_start, standup_active, standup_send
 from workplace import change_permission, remove_user, reset_workplace
 from password import password_request, password_reset
+from search import query_search
 
 def defaultHandler(err):
     response = err.get_response()
@@ -28,11 +29,14 @@ def defaultHandler(err):
     return response
 
 APP = Flask(__name__)
-CORS(APP)
+
 mail = Mail(APP)
+
+CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
+APP.config.update
 
 # Example
 @APP.route("/echo", methods=['GET'])
@@ -958,11 +962,12 @@ def request_code():
     request_code_return = password_request(email)
 
     if request_code_return == "not a user":
-        raise InputError(description='The requested email does not belong to a user')  
+        raise InputError(description='The requested email does not belong to a user') 
 
 
     msg = Message("Password Reset Request", sender="SLACKRSERVER@gmail.com", recipients=[email])
-    msg.body = "Your Password Reset Code is:\n" + request_code_return
+    code = "Your Password Reset Code is:\n" + request_code_return
+    msg.body = code
     mail.send(msg)
 
     return {}
@@ -991,6 +996,24 @@ def reset_password():
 
     return {}
 
+''' =================== SEARCH  =================== '''
+@APP.route("/search", methods=['GET'])
+def search_string():
+    
+    if not request.args.get('token'):
+        raise InputError(description='No Token passed')
+    if not request.args.get('query_str'):
+        raise InputError(description='No Query String passed')
+
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+
+    search_return = query_search(token, query_str)
+
+    if search_return == "invalid token":
+        raise InputError(description='Invalid token key')
+
+    return dumps(search_return)
 
 
 
