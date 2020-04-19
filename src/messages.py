@@ -24,10 +24,10 @@ def message_send(token, channel_id, message):
     if not user_inchannel(user_index, channel_id):
         return "not member"
 
-    dt_now = datetime.now()
-    timestamp = dt_now.replace(tzinfo=timezone.utc).timestamp()
+    dt_now = datetime.utcnow()
+    timestamp = int((dt_now - datetime(1970, 1, 1)).total_seconds())
 
-    new_message = create_message_dict(user_id, message, int(timestamp))
+    new_message = create_message_dict(user_id, message, timestamp)
 
     for channel in data['channels']:
         if channel_id == channel['channel_id']:
@@ -52,8 +52,9 @@ def message_sendlater(token, channel_id, message, time_sent):
     if not user_inchannel(user_index, channel_id):
         return "not member"
     
-    dt_now = datetime.now()
-    timestamp = dt_now.replace(tzinfo=timezone.utc).timestamp()
+    dt_now = datetime.utcnow()
+    timestamp = int((dt_now - datetime(1970, 1, 1)).total_seconds())
+
     if timestamp > time_sent:
         return "time passed"
 
@@ -263,25 +264,61 @@ def channel_messages(token, channel_id, start):
     if not user_in_channel:
         return "not member"
 
-    list_of_messages = channel_dict['messages']
-
-    list_of_messages_copy = list_of_messages[:]
-    if len(list_of_messages_copy) > 1:
-        list_of_messages_copy.reverse()
-
     end = start + 50
 
-    if start > len(list_of_messages):
+    list_of_messages = channel_dict['messages']
+
+    if len(list_of_messages) > 0:
+
+        # filter through to only show messages with time < utcnow()
+        dt_now = datetime.utcnow()
+        timestamp = int((dt_now - datetime(1970, 1, 1)).total_seconds())
+
+        if channel_dict['startup_active']:
+            if timestamp > channel_dict['standup_finish']:
+            
+                combine_message = []
+                for standup_msges in channel_dict['standup_messages']:
+                    combine_message.append(standup_msges['message'])
+                
+                seperator = '\n'
+                combined_message = seperator.join(combine_message)
+
+                standup_u_id = channel_dict['standup_starter']
+                standup_time = channel_dict['standup_finish']
+
+                combined_message_dict = create_message_dict(standup_u_id, combined_message, standup_time)
+
+                list_of_messages.append(combined_message_dict)
+
+                channel_dict['standup_finish'] = None
+                channel_dict['standup_starter'] = None
+                channel_dict['startup_active'] = False
+                for remove_message in channel_dict['standup_messages']:
+                    delete_msg = remove_message
+                    channel_dict['standup_messages'].remove(delete_msg)
+
+        list_of_messages_toshow = list(filter(lambda m: m['time_created'] <= timestamp, list_of_messages))
+
+        list_of_messages_toshow_sorted = sorted(list_of_messages_toshow, key=lambda k: k['time_created'], reverse=True) 
+
+        if start > len(list_of_messages):
+            return {
+            'messages': list_of_messages_toshow_sorted[start : end],
+            'start': start,
+            'end': -1
+            }
+
         return {
-        'messages': list_of_messages_copy[start : end],
+        'messages': list_of_messages_toshow_sorted[start : end],
         'start': start,
-        'end': -1
+        'end': end
     }
 
     return {
-        'messages': list_of_messages_copy[start : end],
+        'messages': list_of_messages,
         'start': start,
-        'end': end
+        'end': -1
     }
 
 

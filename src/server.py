@@ -11,6 +11,7 @@ from channels import channel_addowner, channel_removeowner, channel_leave
 from messages import message_send, message_sendlater, message_react, message_unreact
 from messages import message_pin, message_unpin, message_remove, message_edit
 from messages import channel_messages
+from standup import standup_start, standup_active, standup_send
 
 def defaultHandler(err):
     response = err.get_response()
@@ -547,6 +548,7 @@ def msg_sendlater():
     time_sent = payload['time_sent']
 
     channel_id = int(channel_id)
+    time_sent = int(time_sent)
 
     message_sendlater_return = message_sendlater(token, channel_id, message, time_sent)
 
@@ -792,6 +794,88 @@ def load_messages():
         raise AccessError(description="Authorised user is not a member of this channel")
     
     return dumps(channel_messages_return)
+
+''' =================== STARTS A STARTUP  =================== '''
+@APP.route("/standup/start", methods=['POST'])
+def start_standup():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'length' in payload:
+        raise InputError(description='No length of time passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+    length = int(payload['length'])
+
+    standup_start_return = standup_start(token, channel_id, length)
+
+    if standup_start_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_start_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if standup_start_return == "standup already active":
+        raise AccessError(description="Standup is already in Progress")
+
+    return dumps(standup_start_return)
+
+''' =================== CHECKS IS STANDUP IS ACTIVE =================== '''
+@APP.route("/standup/active", methods=['GET'])
+def active_standup():
+    
+    if not request.args.get('token'):
+        raise InputError(description='No token passed')
+    if not request.args.get('channel_id'):
+        raise InputError(description='No channel_id passed')
+
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    standup_active_return = standup_active(token, channel_id)
+
+    if standup_active_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_active_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+
+    return dumps(standup_active_return)
+
+''' =================== SENDS A MESSAGE TO STANDUP =================== '''
+@APP.route("/standup/send", methods=['POST'])
+def send_startup_msg():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+    message = payload['message']
+
+    standup_send_return = standup_send(token, channel_id, message)
+
+    if standup_send_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_send_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if standup_send_return == "More than 1000 characters":
+        raise InputError(description="Message is too long")
+    if standup_send_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")
+
+    return {}
+
 
 
 if __name__ == "__main__":
