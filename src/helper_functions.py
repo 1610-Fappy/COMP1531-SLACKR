@@ -2,6 +2,7 @@
 import re
 import jwt
 from database import get_data
+import uuid
 
 SECRET = 'DaddyItachi'
 
@@ -11,17 +12,21 @@ def generate_token(user_id):
     encoded = jwt.encode({'u_id' : user_id}, SECRET, algorithm='HS256').decode("utf-8")
     return str(encoded)
 
-def generate_channelid(channel_name):
+# def generate_channelid(channel_name):
+#     ''' Generates a channel id for channel'''
+#     global SECRET
+#     encoded = jwt.encode({'channel_id' : channel_name}, SECRET, algorithm='HS256').decode("utf-8")
+#     return str(encoded)
+
+def generate_channelid():
     ''' Generates a channel id for channel'''
-    global SECRET
-    encoded = jwt.encode({'channel_id' : channel_name}, SECRET, algorithm='HS256').decode("utf-8")
-    return str(encoded)
+    return uuid.uuid4().int>>112
 
 def decode_token(token):
     ''' Decodes a token to access user details'''
     global SECRET
     decoded = jwt.decode(token, SECRET, algorithms='HS256')
-    return str(decoded['u_id'])
+    return int(decoded['u_id'])
 
 def get_user(user_id):
     ''' Gets user using given u_id'''

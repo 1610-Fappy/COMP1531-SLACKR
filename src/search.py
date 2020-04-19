@@ -1,6 +1,7 @@
 import re
 from database import get_data
 from helper_functions import decode_token, get_user, valid_token
+from datetime import timezone, datetime
 
 def query_search(token, query_str):
     data = get_data()
@@ -17,6 +18,12 @@ def query_search(token, query_str):
             if re.search(query_str, channel_messages['message']):
                 search_list.append(channel_messages)
 
-    search_list_sorted = sorted(search_list, key=lambda k: k['time_created'], reverse=True)
+    dt_now = datetime.utcnow()
+    timestamp = int((dt_now - datetime(1970, 1, 1)).total_seconds())
 
-    return { 'messages' : search_list_sorted}
+    search_list_filter = list(filter(lambda m: m['time_created'] <= timestamp, search_list))
+    search_list_sorted = sorted(search_list_filter, key=lambda k: k['time_created'], reverse=True)
+
+    return { 
+        'messages' : search_list_sorted
+    }

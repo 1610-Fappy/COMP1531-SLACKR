@@ -1,6 +1,6 @@
 import sys
 from json import dumps
-from flask import Flask, request, abort
+from flask import Flask, request
 from flask_cors import CORS
 from flask_mail import Mail, Message
 from error import InputError, AccessError
@@ -9,8 +9,11 @@ from user import user_profile, user_setname, user_setemail, user_sethandle, user
 from channels import channel_create, channel_invite, channel_join
 from channels import channel_details, channel_listall, channel_list
 from channels import channel_addowner, channel_removeowner, channel_leave
-from workplace import change_permission, remove_user, reset_workplace
+from messages import message_send, message_sendlater, message_react, message_unreact
+from messages import message_pin, message_unpin, message_remove, message_edit
+from messages import channel_messages
 from standup import standup_start, standup_active, standup_send
+from workplace import change_permission, remove_user, reset_workplace
 from password import password_request, password_reset
 from search import query_search
 
@@ -26,6 +29,9 @@ def defaultHandler(err):
     return response
 
 APP = Flask(__name__)
+
+mail = Mail(APP)
+
 CORS(APP)
 mail = Mail(APP)
 
@@ -38,6 +44,7 @@ APP.config(
     MAIL_PASSWORD = 'Password123'
 )
 APP.register_error_handler(Exception, defaultHandler)
+APP.config.update
 
 # Example
 @APP.route("/echo", methods=['GET'])
@@ -140,14 +147,14 @@ def usr_prfile():
     token = request.args.get('token')
     u_id = request.args.get('u_id')
 
+    u_id = int(u_id)
+
     user_profile_return = user_profile(token, u_id)
 
     if user_profile_return == "invalid u_id":
         raise InputError(description='USER ID not found in records')
     if user_profile_return == "invalid token":
         raise InputError(description='Invalid token key')
-
-    print(user_profile_return)
 
     return dumps({
         'user': user_profile_return
@@ -248,7 +255,7 @@ def users_all():
     if user_all_return == "invalid token":
         raise InputError(description="Invalid token key")
 
-    return (
+    return dumps(
         {
         "users": user_all_return
         }
@@ -299,6 +306,9 @@ def channels_invite():
     channel_id = payload['channel_id']
     u_id = payload['u_id']
 
+    u_id = int(u_id)
+    channel_id = int(channel_id)
+
     channel_invite_return = channel_invite(token, channel_id, u_id)
 
     if channel_invite_return == "invalid token":
@@ -329,6 +339,7 @@ def channels_join():
 
     token = payload['token']
     channel_id = payload['channel_id']
+    channel_id = int(channel_id)
 
     channel_join_return = channel_join(token, channel_id)
 
@@ -380,6 +391,8 @@ def channels_details():
     token = request.args.get('token')
     channel_id = request.args.get('channel_id')
 
+    channel_id = int(channel_id)
+
     channel_details_return = channel_details(token, channel_id)
 
     if channel_details_return == "invalid token":
@@ -388,7 +401,6 @@ def channels_details():
         raise InputError(description="Invalid Channel ID")
     if channel_details_return == "not member":
         raise AccessError(description="Authorised user is not part of the channel")
-    
 
     return dumps(channel_details_return)
 
@@ -442,6 +454,9 @@ def channels_addowner():
     channel_id = payload['channel_id']
     u_id = payload['u_id']
 
+    u_id = int(u_id)
+    channel_id = int(channel_id)
+
     channel_addowner_return = channel_addowner(token, channel_id, u_id)
 
     if channel_addowner_return == "invalid token":
@@ -473,6 +488,9 @@ def channels_removeowner():
     channel_id = payload['channel_id']
     u_id = payload['u_id']
 
+    u_id = int(u_id)
+    channel_id = int(channel_id)
+
     channel_removeowner_return = channel_removeowner(token, channel_id, u_id)
 
     if channel_removeowner_return == "invalid token":
@@ -486,6 +504,554 @@ def channels_removeowner():
 
     return {}
 
+<<<<<<< HEAD
+=======
+''' =================== REMOVE OWNER STATUS FROM MEMBER  =================== '''
+@APP.route("/channel/leave", methods=['POST'])
+def leave_channel():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+
+    channel_id = int(channel_id)
+
+    channel_leave_return = channel_leave(token, channel_id)
+
+    if channel_leave_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_leave_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_leave_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")    
+
+    return {}
+
+
+''' =================== SEND A MESSAGE IN A CHANNEL  =================== '''
+@APP.route("/message/send", methods=['POST'])
+def msg_send():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    message = payload['message']
+
+    channel_id = int(channel_id)
+
+    message_send_return = message_send(token, channel_id, message)
+
+    if message_send_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_send_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if message_send_return == "more than 1000 characters":
+        raise InputError(description="Message must be less than 1000 characters")
+    if message_send_return == "not member":
+        raise AccessError(description="User is not a member of this channel")
+
+    return dumps({
+        'message_id': message_send_return
+    })
+
+''' ================ SEND A MESSAGE LATER IN A CHANNEL  ================ '''
+@APP.route("/message/sendlater", methods=['POST'])
+def msg_sendlater():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+    if not 'time_sent' in payload:
+        raise InputError(description='No time_sent passed')
+
+    token = payload['token']
+    channel_id = payload['channel_id']
+    message = payload['message']
+    time_sent = payload['time_sent']
+
+    channel_id = int(channel_id)
+    time_sent = int(time_sent)
+
+    message_sendlater_return = message_sendlater(token, channel_id, message, time_sent)
+
+    if message_sendlater_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_sendlater_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if message_sendlater_return == "more than 1000 characters":
+        raise InputError(description="Message must be less than 1000 characters")
+    if message_sendlater_return == "time passed":
+        raise InputError(description="Cannot send messages in the past")
+    if message_sendlater_return == "not member":
+        raise AccessError(description="User is not a member of this channel")
+
+    return dumps({
+        'message_id': message_sendlater_return
+    })
+
+''' ================ REACT TO A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/react", methods=['POST'])
+def msg_react():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+    if not 'react_id' in payload:
+        raise InputError(description='No react_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+    react_id = payload['react_id']
+
+    message_id = int(message_id)
+    react_id = int(react_id)
+
+    message_react_return = message_react(token, message_id, react_id)
+
+    if message_react_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_react_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_react_return == "invalid react_id":
+        raise InputError(description="Invalid React ID")
+    # if message_react_return == "already reacted to":
+    #     raise InputError(description="Already reacted")
+    if message_react_return == "not a member":
+        raise AccessError(description="Not a member of channel")
+
+    return dumps({})
+
+''' ================ REACT TO A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/unreact", methods=['POST'])
+def msg_unreact():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+    if not 'react_id' in payload:
+        raise InputError(description='No react_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+    react_id = payload['react_id']
+
+    message_id = int(message_id)
+    react_id = int(react_id)
+
+    message_unreact_return = message_unreact(token, message_id, react_id)
+
+    if message_unreact_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_unreact_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_unreact_return == "invalid react_id":
+        raise InputError(description="Invalid React ID")
+    if message_unreact_return == "not a member":
+        raise AccessError(description="Not a member of channel")
+
+    return dumps({})
+
+''' ================ PIN A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/pin", methods=['POST'])
+def msg_pin():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+
+    message_id = int(message_id)
+
+    message_pin_return = message_pin(token, message_id)
+
+    if message_pin_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_pin_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_pin_return == "already pinned":
+        raise InputError(description="Message already pinned")
+    if message_pin_return == "not member":
+        raise AccessError(description="Authorised user is not a member of this channel")
+    if message_pin_return == "not owner":
+        raise AccessError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ UNPIN A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/unpin", methods=['POST'])
+def msg_unpin():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+
+    message_id = int(message_id)
+
+    message_unpin_return = message_unpin(token, message_id)
+
+    if message_unpin_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_unpin_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_unpin_return == "already unpinned":
+        raise InputError(description="Message already unpinned")
+    if message_unpin_return == "not member":
+        raise AccessError(description="Authorised user is not a member of this channel")
+    if message_unpin_return == "not owner":
+        raise AccessError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ REMOVE A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/remove", methods=['DELETE'])
+def msg_remove():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+
+    message_id = int(message_id)
+
+    message_remove_return = message_remove(token, message_id)
+
+    if message_remove_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_remove_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_remove_return == "not member":
+        raise AccessError(description="Authorised user is not a member of this channel")
+    if message_remove_return == "not owner":
+        raise AccessError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ EDIT A MESSAGE IN A CHANNEL  ================ '''
+@APP.route("/message/edit", methods=['PUT'])
+def msg_edit():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'message_id' in payload:
+        raise InputError(description='No message_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    message_id = payload['message_id']
+    message = payload['message']
+
+    message_id = int(message_id)
+
+    message_edit_return = message_edit(token, message_id, message)
+
+    if message_edit_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if message_edit_return == "more than 1000 characters":
+        raise InputError(description="Message must be less than 1000 characters")
+    if message_edit_return == "invalid message_id":
+        raise InputError(description="Invalid Message ID")
+    if message_edit_return == "not member":
+        raise AccessError(description="Authorised user is not a member of this channel")
+    if message_edit_return == "not owner":
+        raise AccessError(description="Authorised user is not an owner of this channel")
+
+    return dumps({})
+
+''' ================ LOAD MESSAGEs IN A CHANNEL  ================ '''
+@APP.route("/channel/messages", methods=['GET'])
+def load_messages():
+    
+    if not request.args.get('token'):
+        raise InputError(description='No token passed')
+    if not request.args.get('channel_id'):
+        raise InputError(description='No channel_id passed')
+    if not request.args.get('start'):
+        raise InputError(description='No start passed')
+
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id')
+    start = request.args.get('start')
+
+    start = int(start)
+    channel_id = int(channel_id)
+
+    channel_messages_return = channel_messages(token, channel_id, start)
+
+    if channel_messages_return == "invalid token":
+        raise InputError(description='Invalid token key')
+    if channel_messages_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if channel_messages_return == "not member":
+        raise AccessError(description="Authorised user is not a member of this channel")
+    
+    return dumps(channel_messages_return)
+
+''' =================== STARTS A STARTUP  =================== '''
+@APP.route("/standup/start", methods=['POST'])
+def start_standup():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'length' in payload:
+        raise InputError(description='No length of time passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+    length = int(payload['length'])
+
+    standup_start_return = standup_start(token, channel_id, length)
+
+    if standup_start_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_start_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if standup_start_return == "standup already active":
+        raise AccessError(description="Standup is already in Progress")
+
+    return dumps(standup_start_return)
+
+''' =================== CHECKS IS STANDUP IS ACTIVE =================== '''
+@APP.route("/standup/active", methods=['GET'])
+def active_standup():
+    
+    if not request.args.get('token'):
+        raise InputError(description='No token passed')
+    if not request.args.get('channel_id'):
+        raise InputError(description='No channel_id passed')
+
+    token = request.args.get('token')
+    channel_id = int(request.args.get('channel_id'))
+
+    standup_active_return = standup_active(token, channel_id)
+
+    if standup_active_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_active_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+
+    return dumps(standup_active_return)
+
+''' =================== SENDS A MESSAGE TO STANDUP =================== '''
+@APP.route("/standup/send", methods=['POST'])
+def send_startup_msg():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'channel_id' in payload:
+        raise InputError(description='No channel_id passed')
+    if not 'message' in payload:
+        raise InputError(description='No message passed')
+
+    token = payload['token']
+    channel_id = int(payload['channel_id'])
+    message = payload['message']
+
+    standup_send_return = standup_send(token, channel_id, message)
+
+    if standup_send_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if standup_send_return == "invalid channel_id":
+        raise InputError(description="Invalid Channel ID")
+    if standup_send_return == "More than 1000 characters":
+        raise InputError(description="Message is too long")
+    if standup_send_return == "not member":
+        raise AccessError(description="Authorised user is not part of the channel")
+
+    return {}
+
+''' =================== CHANGES A USER'S PERMISSION  =================== '''
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def change_permissions():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+    if not 'permission_id' in payload:
+        raise InputError(description='No permission_id passed')
+
+    token = payload['token']
+    u_id = int(payload['u_id'])
+    permission_id = int(payload['permission_id'])
+
+    change_permission_return = change_permission(token, u_id, permission_id)
+
+    if change_permission_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if change_permission_return == "invalid permission_id":
+        raise InputError(description="Invalid Permission ID")
+    if change_permission_return == "invalid permissions":
+        raise AccessError(description="User is not Authorised")
+    if change_permission_return == "invalid u_id":
+        raise AccessError(description="User ID is invalid")
+
+    return {}
+
+''' =================== REMOVES A USER FROM SLACK =================== '''
+@APP.route("/admin/user/remove", methods=['DELETE'])
+def remove_users():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'token' in payload:
+        raise InputError(description='No token passed')
+    if not 'u_id' in payload:
+        raise InputError(description='No u_id passed')
+
+    token = payload['token']
+    u_id = int(payload['u_id'])
+
+    remove_user_return = remove_user(token, u_id)
+
+    if remove_user_return == "invalid token":
+        raise InputError(description='Invalid token key')  
+    if remove_user_return == "invalid permissions":
+        raise AccessError(description="User is not Authorised")
+    if remove_user_return == "invalid u_id":
+        raise AccessError(description="User ID is invalid")
+
+    return {}
+
+''' =================== RESETS WORKSPACE =================== '''
+@APP.route("/workspace/reset", methods=['POST'])
+def refresh():
+    reset_workplace()
+    return {}
+
+''' =================== RESET PASSWORD REQUEST =================== '''
+@APP.route("/auth/passwordreset/request", methods=['POST'])
+def request_code():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'email' in payload:
+        raise InputError(description='No Email passed')
+
+    email = payload['email']
+
+    request_code_return = password_request(email)
+
+    if request_code_return == "not a user":
+        raise InputError(description='The requested email does not belong to a user') 
+
+
+    msg = Message("Password Reset Request", sender="SLACKRSERVER@gmail.com", recipients=[email])
+    code = "Your Password Reset Code is:\n" + request_code_return
+    msg.body = code
+    mail.send(msg)
+
+    return {}
+
+''' =================== RESET PASSWORD GIVEN RESET CODE  =================== '''
+@APP.route("/auth/passwordreset/reset", methods=['POST'])
+def reset_password():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'reset_code' in payload:
+        raise InputError(description='No Reset Code passed')
+    if not 'new_password' in payload:
+        raise InputError(description='No new Password to be set')
+
+    reset_code = payload['reset_code']
+    new_password = payload['new_password']
+
+    reset_pass_return = password_reset(reset_code, new_password)
+
+    if reset_pass_return == "invalid password":
+        raise InputError(description='The inputed password is not valid')
+    if reset_pass_return == "invalid reset code":
+        raise InputError(description='The inputted code is invalid')  
+
+    return {}
+
+''' =================== SEARCH  =================== '''
+@APP.route("/search", methods=['GET'])
+def search_string():
+    
+    if not request.args.get('token'):
+        raise InputError(description='No Token passed')
+    if not request.args.get('query_str'):
+        raise InputError(description='No Query String passed')
+
+    token = request.args.get('token')
+    query_str = request.args.get('query_str')
+
+    search_return = query_search(token, query_str)
+
+    if search_return == "invalid token":
+        raise InputError(description='Invalid token key')
+
+    return dumps(search_return)
+
+>>>>>>> server_messages
 
 ''' =================== Starts a Standup  =================== '''
 @APP.route("/standup/start", methods=['POST'])
@@ -727,6 +1293,3 @@ def refresh():
 
 if __name__ == "__main__":
     APP.run(port=(int(sys.argv[1]) if len(sys.argv) == 2 else 8080), debug=True)
-
-# FIX
-# - changing request?

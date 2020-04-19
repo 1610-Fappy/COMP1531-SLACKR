@@ -8,37 +8,46 @@ def reset_workplace():
     data['users'] = []
     data['channels'] = []
     data['active_tokens'] = []
-    data['reset_codes'] = []
-    data['messages'] = []
+
+    return
 
 def change_permission(token, u_id, permission_id):
     ''' Changes the permissions of a user '''
     data = get_data()
     if not valid_token(token):
         return "invalid token"
-    if permission_id in [1, 2]:
-        token_u_id = decode_token(token)
-        token_user_index = get_user(token_u_id)
-        new_user_index = get_user(u_id)
-        if data['users'][token_user_index]['permissions'] != 1:
-            return "invalid permissions"
-        if new_user_index == -1:
-            return "invalid u_id"
-    else:
-        return "invalid permission_id"
 
-    data['users'][new_user_index]['permissions'] = permission_id
+    token_u_id = decode_token(token)
+    token_user_index = get_user(token_u_id)
+
+    new_user_index = get_user(u_id)
+
+    if data['users'][token_user_index]['permission_id'] != 1:
+        return "invalid permissions"
+
+    if permission_id not in [1, 2]:
+        return "invalid permission_id"
+  
+    if new_user_index == -1:
+        return "invalid u_id"
+        
+    data['users'][new_user_index]['permission_id'] = permission_id
+    return
 
 def remove_user(token, u_id):
     ''' Removes a user from the slackr '''
     data = get_data()
+
     if not valid_token(token):
         return "invalid token"
+
     token_u_id = decode_token(token)
     token_user_index = get_user(token_u_id)
     new_user_index = get_user(u_id)
+
     if data['users'][token_user_index]['permissions'] != 1:
         return "invalid permissions"
+
     if new_user_index == -1:
         return "invalid u_id"
 
@@ -52,3 +61,4 @@ def remove_user(token, u_id):
                 channels['owner_members'].remove(member)
 
     data['users'].remove(user)
+    return
