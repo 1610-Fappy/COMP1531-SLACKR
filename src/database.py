@@ -15,7 +15,9 @@
 #     'owner_members' : [],
 #     'all_members' : [],
 #     'is_public' : None,
-#     'messages' : []
+#     'messages' : [],
+#     'standup_finish' : None,
+#     'standup_messages' : []
 # }
 
 DATA = {
