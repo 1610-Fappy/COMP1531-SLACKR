@@ -2,6 +2,7 @@ import sys
 from json import dumps
 from flask import Flask, request, abort
 from flask_cors import CORS
+from flask_mail import Mail, Message
 from error import InputError, AccessError
 from auth import auth_register, auth_login, auth_logout
 from user import user_profile, user_setname, user_setemail, user_sethandle, user_all
@@ -13,6 +14,7 @@ from messages import message_pin, message_unpin, message_remove, message_edit
 from messages import channel_messages
 from standup import standup_start, standup_active, standup_send
 from workplace import change_permission, remove_user, reset_workplace
+from password import password_request, password_reset
 
 def defaultHandler(err):
     response = err.get_response()
@@ -27,6 +29,7 @@ def defaultHandler(err):
 
 APP = Flask(__name__)
 CORS(APP)
+mail = Mail(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
 APP.register_error_handler(Exception, defaultHandler)
@@ -939,6 +942,55 @@ def remove_users():
 def refresh():
     reset_workplace()
     return {}
+
+''' =================== RESET PASSWORD REQUEST =================== '''
+@APP.route("/auth/passwordreset/request", methods=['POST'])
+def request_code():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'email' in payload:
+        raise InputError(description='No Email passed')
+
+    email = payload['email']
+
+    request_code_return = password_request(email)
+
+    if request_code_return == "not a user":
+        raise InputError(description='The requested email does not belong to a user')  
+
+
+    msg = Message("Password Reset Request", sender="SLACKRSERVER@gmail.com", recipients=[email])
+    msg.body = "Your Password Reset Code is:\n" + request_code_return
+    mail.send(msg)
+
+    return {}
+
+''' =================== RESET PASSWORD GIVEN RESET CODE  =================== '''
+@APP.route("/auth/passwordreset/reset", methods=['POST'])
+def reset_password():
+    payload = request.get_json()
+
+    if not payload:
+        raise InputError(description='No args passed')
+    if not 'reset_code' in payload:
+        raise InputError(description='No Reset Code passed')
+    if not 'new_password' in payload:
+        raise InputError(description='No new Password to be set')
+
+    reset_code = payload['reset_code']
+    new_password = payload['new_password']
+
+    reset_pass_return = password_reset(reset_code, new_password)
+
+    if reset_pass_return == "invalid password":
+        raise InputError(description='The inputed password is not valid')
+    if reset_pass_return == "invalid reset code":
+        raise InputError(description='The inputted code is invalid')  
+
+    return {}
+
 
 
 

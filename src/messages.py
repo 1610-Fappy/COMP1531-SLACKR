@@ -287,7 +287,7 @@ def channel_messages(token, channel_id, start):
                 standup_u_id = channel_dict['standup_starter']
                 standup_time = channel_dict['standup_finish']
 
-                combined_message_dict = create_message_dict(standup_u_id, combined_message, standup_time)
+                combined_message_dict = create_message_dict(standup_u_id, "STANDUP:\n" + combined_message, standup_time)
 
                 list_of_messages.append(combined_message_dict)
 
