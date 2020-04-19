@@ -33,7 +33,7 @@ mail = Mail(APP)
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
-APP.config(
+APP.config.update(
     MAIL_SERVER='smtp.gmail.com',
     MAIL_PORT=465,
     MAIL_USE_SSL=True,
@@ -41,7 +41,6 @@ APP.config(
     MAIL_PASSWORD = 'Password123'
 )
 APP.register_error_handler(Exception, defaultHandler)
-APP.config.update
 
 
 # Example
