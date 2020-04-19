@@ -217,7 +217,11 @@ def get_channel_dict(name, is_public):
         'owner_members' : [],
         'all_members' : [],
         'is_public' : is_public,
-        'messages': []
+        'messages': [],
+        'standup_finish' : None,
+        'standup_messages' : [],
+        'standup_starter': None,
+        'startup_active': False
     }
     return channel
 
