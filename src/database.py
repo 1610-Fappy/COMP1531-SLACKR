@@ -24,7 +24,8 @@ DATA = {
     'users' : [],
     'active_tokens' : [],
     'channels' : [],
-    'messages' : []
+    'messages' : [],
+    'reset_codes' : []
 }
 
 MEMBER_DICT = { 

@@ -8,6 +8,8 @@ def reset_workplace():
     data['users'] = []
     data['channels'] = []
     data['active_tokens'] = []
+    data['reset_codes'] = []
+    data['messages'] = []
 
 def change_permission(token, u_id, permission_id):
     ''' Changes the permissions of a user '''
